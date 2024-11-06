@@ -7,7 +7,6 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import BotCommand
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 import config
 from app import database as db
@@ -45,11 +44,6 @@ async def set_bot_commands() -> None:
 
 
 async def main() -> None:
-    """scheduler = AsyncIOScheduler(timezone=config.TIMEZONE)
-    scheduler.add_job(db.reset_sent_today, "cron", hour="0")
-    scheduler.add_job(script.daily_horoscope, "cron", hour="10")
-    scheduler.start()"""
-
     #dp.startup.register(on_startup)
     await set_bot_commands()
     await dp.start_polling(bot, on_shutdown=on_shutdown)

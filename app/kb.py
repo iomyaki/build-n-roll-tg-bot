@@ -1,4 +1,4 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 import generator
 
@@ -15,7 +15,7 @@ def creation_mode() -> ReplyKeyboardMarkup:
     )
 
 
-def keyboard_generator(buttons_in_row: int, iterable: dict or set or list) -> list[list[KeyboardButton]]:
+def generate_keyboard(buttons_in_row: int, iterable: dict or set or list) -> list[list[KeyboardButton]]:
     cnt = 0
     keyboard = []
     row = []
@@ -34,20 +34,20 @@ def keyboard_generator(buttons_in_row: int, iterable: dict or set or list) -> li
 
 def select_race() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
-        keyboard=keyboard_generator(5, generator.race_feats),
+        keyboard=generate_keyboard(5, generator.race_feats),
         resize_keyboard=True,
     )
 
 
 def select_class() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
-        keyboard=keyboard_generator(3, generator.class_characteristics),
+        keyboard=generate_keyboard(3, generator.class_characteristics),
         resize_keyboard=True,
     )
 
 
 def select_subclass(char_class) -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
-        keyboard=keyboard_generator(5, generator.subclass_dict[char_class]),
+        keyboard=generate_keyboard(5, generator.subclass_dict[char_class]),
         resize_keyboard=True,
     )
