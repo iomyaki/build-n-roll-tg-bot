@@ -68,7 +68,7 @@ async def handle_race(message: Message, state: FSMContext) -> None:
 @r.message(Form.char_class)
 async def handle_class(message: Message, state: FSMContext) -> None:
     if message.text not in generator.class_characteristics:
-        await message.answer("That is not supported. Please the class of your character:", reply_markup=kb.select_class())
+        await message.answer("That is not supported. Please select the class of your character:", reply_markup=kb.select_class())
         return
     char_class = message.text
     bot_message = "Select the subclass of your character:"
@@ -88,7 +88,7 @@ async def handle_subclass(message: Message, state: FSMContext) -> None:
         return
 
     if message.text not in generator.subclass_dict[char_class]:
-        await message.answer("That is not supported. Please the subclass of your character:", reply_markup=kb.select_subclass(char_class))
+        await message.answer("That is not supported. Please select the subclass of your character:", reply_markup=kb.select_subclass(char_class))
         return
 
     bot = message.bot
