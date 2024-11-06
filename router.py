@@ -56,21 +56,10 @@ async def handle_race(message: Message, state: FSMContext) -> None:
 
 @r.message(Form.char_class)
 async def handle_class(message: Message, state: FSMContext) -> None:
-    character_class = message.text
+    char_class = message.text
     bot_message = "Select the subclass of your character:"
-    await state.update_data(answer_class=character_class)
-
-    if character_class == "Fighter":
-        await message.answer(bot_message, reply_markup=kb.select_subclass_fighter())
-    elif character_class == "Rogue":
-        await message.answer(bot_message, reply_markup=kb.select_subclass_rogue())
-    elif character_class == "Sorcerer":
-        await message.answer(bot_message, reply_markup=kb.select_subclass_sorcerer())
-    elif character_class == "Wizard":
-        await message.answer(bot_message, reply_markup=kb.select_subclass_wizard())
-    else:
-        raise ValueError
-
+    await state.update_data(answer_class=char_class)
+    await message.answer(bot_message, reply_markup=kb.select_subclass(char_class))
     await state.set_state(Form.subclass)
 
 
