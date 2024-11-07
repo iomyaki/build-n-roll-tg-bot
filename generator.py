@@ -1,7 +1,9 @@
 import random
+import sqlite3 as sq
 
 # Dictionary mapping D&D classes to their main and secondary characteristics
 class_characteristics = {
+    "Artificer": {"main": "Intelligence", "secondary": "Constitution"},
     "Barbarian": {"main": "Strength", "secondary": "Constitution"},
     "Bard": {"main": "Charisma", "secondary": "Dexterity"},
     "Cleric": {"main": "Wisdom", "secondary": "Constitution"},
@@ -16,11 +18,21 @@ class_characteristics = {
     "Wizard": {"main": "Intelligence", "secondary": "Wisdom"},
 }
 
+# Dictionary mapping the code above to correctly work with db
+db_mapping_characteristics = {
+    "Strength": "str",
+    "Dexterity": "dex",
+    "Constitution": "con",
+    "Intelligence": "int",
+    "Wisdom": "wis",
+    "Charisma": "cha"
+}
+
 race_feats = {
     "Dwarf": {"main": "Constitution", "secondary": None},
     "Elf": {"main": "Dexterity", "secondary": None},
     "Halfling": {"main": "Dexterity", "secondary": None},
-    "Human": {"main": None, "secondary": None},  #all +1
+    "Human": {"main": None, "secondary": None}, #all +1
     "Aasimar": {"main": "Charisma", "secondary": None},
     "Dragonborn": {"main": "Strength", "secondary": "Charisma"},
     "Gnome": {"main": "Intelligence", "secondary": None},
@@ -37,6 +49,7 @@ race_feats = {
     "Duergar": {"main": "Strength", "secondary": "Constitution"},
     "Eladrin": {"main": "Dexterity", "secondary": "Charisma"},
     "Firbolg": {"main": "Wisdom", "secondary": "Strength"},
+    "Fairy": {"main": "Charisma", "secondary": None},
     "Fire Genasi": {"main": "Intelligence", "secondary": "Charisma"},
     "Githyanki": {"main": "Strength", "secondary": "Intelligence"},
     "Githzerai": {"main": "Wisdom", "secondary": "Intelligence"},
@@ -46,6 +59,8 @@ race_feats = {
     "Kenku": {"main": "Dexterity", "secondary": "Wisdom"},
     "Kobold": {"main": "Dexterity", "secondary": "Intelligence"},
     "Lizardfolk": {"main": "Constitution", "secondary": "Wisdom"},
+    "Minotaur": {"main": "Strength", "secondary": "Constitution"},
+    "Satyr": {"main": "Charisma", "secondary": "Dexterity"},
     "Sea Elf": {"main": "Dexterity", "secondary": "Wisdom"},
     "Shadar-kai": {"main": "Dexterity", "secondary": "Charisma"},
     "Shifter": {"main": "Dexterity", "secondary": "Strength"},
@@ -76,13 +91,14 @@ race_feats = {
     "Locathah": {"main": "Wisdom", "secondary": "Constitution"},
     "Grung": {"main": "Dexterity", "secondary": "Constitution"},
     "Gith": {"main": "Intelligence", "secondary": "Wisdom"},
-    "Half-Elf": {"main": "Charisma", "secondary": None},  #choose +1
+    "Half-Elf": {"main": "Charisma", "secondary": None}, #choose +1
     "Half-Orc": {"main": "Strength", "secondary": "Constitution"},
     "Bearfolk": {"main": "Strength", "secondary": "Constitution"},
     "Darakhul": {"main": "Constitution", "secondary": "Charisma"},
     "Erina": {"main": "Charisma", "secondary": "Dexterity"},
     "Quickstep": {"main": "Dexterity", "secondary": "Charisma"},
     "Ratatosk": {"main": "Dexterity", "secondary": "Wisdom"},
+    "Ravenfolk": {"main": "Wisdom", "secondary": "Dexterity"},
     "Satarre": {"main": "Charisma", "secondary": "Intelligence"},
     "Shade": {"main": "Dexterity", "secondary": "Charisma"},
     "Shadow Goblin": {"main": "Dexterity", "secondary": "Charisma"},
@@ -121,6 +137,12 @@ background_feats = {
 }
 
 subclass_dict = {
+    "Artificer": [
+        "Alchemist",
+        "Armorer",
+        "Battle Smith",
+        "Artillerist",
+    ],
     "Barbarian": [
         "Berserker",
         "Totem Warrior",
@@ -231,6 +253,97 @@ subclass_dict = {
     ],
 }
 
+# Inside the database the names for subclasses are indexes for ttg.club
+db_mapping_subclasses = {
+    'Alchemist': 'alchemist',
+    'Armorer': 'armorer',
+    'Battle Smith': 'battle_smith',
+    'Artillerist': 'artillerist',
+    'Berserker': 'berserker',
+    'Totem Warrior': 'totem_warrior',
+    'Ancestral Guardian': 'ancestral_guardian',
+    'Storm Herald': 'storm_herald',
+    'Zealot': 'zealot',
+    'Beast': 'beast',
+    'Lore': 'lore',
+    'Valor': 'valor',
+    'Swords': 'swords',
+    'College of Whispers': 'whispers',
+    'Glamour': 'glamour',
+    'Creation': 'creation',
+    'Life': "life",
+    'Light': 'light',
+    'Nature': 'nature',
+    'War': 'war',
+    'Trickery': 'trickery',
+    'Knowledge': 'knowledge',
+    'Arcana': 'arcana',
+    'Forge': 'forge',
+    'Grave': 'grave',
+    'Circle of the Moon': 'moon',
+    'Circle of the Land': 'land',
+    'Circle of Spores': 'spores',
+    'Circle of Stars': 'stars',
+    'Circle of Wildfire': 'wildfire',
+    'Champion': 'champion',
+    'Battle Master': 'battle_master',
+    'Eldritch Knight': 'eldritch_knight',
+    'Arcane Archer': 'arcane_archer',
+    'Cavalier': 'cavalier',
+    'Samurai': 'samurai',
+    'Rune Knight': 'rune_knight',
+    'Echo Knight': 'echo',
+    'Way of the Open Hand': 'open_hand',
+    'Way of Shadow': 'shadow',
+    'Way of the Four Elements': 'four_elements',
+    'Way of the Drunken Master': 'drunken_master',
+    'Way of the Kensei': 'kensei',
+    'Way of the Astral Self': 'astral_self',
+    'Way of the Sun Soul': 'sun_soul',
+    'Oath of Devotion': 'devotion',
+    'Oath of the Ancients': 'ancients',
+    'Oath of Vengeance': 'vengeance',
+    'Oath of Conquest': 'conquest',
+    'Oath of Redemption': 'redemption',
+    'Oath of Glory': 'glory',
+    'Oath of the Crown': 'crown',
+    'Hunter': 'hunter',
+    'Beast Master': 'beast_master',
+    'Gloom Stalker': 'gloom_stalker',
+    'Horizon Walker': 'horizon_walker',
+    'Monster Slayer': 'monster_slayer',
+    'Thief': 'thief',
+    'Assassin': 'assassin',
+    'Arcane Trickster': 'arcane_trickster',
+    'Inquisitive': 'inquisitive',
+    'Mastermind': 'mastermind',
+    'Swashbuckler': 'swashbuckler',
+    'Phantom': 'phantom',
+    'Soulknife': 'soulknife',
+    'Draconic Bloodline': 'draconic',
+    'Wild Magic': 'wild_magic',
+    'Divine Soul': 'devine_soul',
+    'Shadow Magic': 'shadow',
+    'Storm Sorcery': 'storm',
+    'Aberrant Mind': 'aberrant_mind',
+    'Clockwork Soul': 'clockwork_soul',
+    'The Archfey': 'archfey',
+    'The Fiend': 'fiend',
+    'The Great Old One': 'great_old_one',
+    'The Celestial': 'celestial',
+    'The Hexblade': 'hexblade',
+    'The Fathomless': 'fathomless',
+    'The Genie': 'genie',
+    'School of Abjuration': 'abjuration',
+    'School of Conjuration': 'conjuration',
+    'School of Divination': 'divination',
+    'School of Enchantment': 'enchantment',
+    'School of Evocation': 'evocation',
+    'School of Illusion': 'illusion',
+    'School of Necromancy': 'necromancy',
+    'School of Transmutation': 'transmutation',
+    'School of War Magic': 'warmage',
+    }
 
 def roll_ability_scores():
     """Roll 4d6 and drop the lowest die to generate an ability score."""
@@ -241,16 +354,13 @@ def roll_ability_scores():
         scores.append(score)
     return scores
 
-
 def calculate_modifier(score):
     """Calculate the ability modifier from the ability score."""
     return (score - 10) // 2
 
-
 def get_characteristics(character_class):
     """Return the main and secondary characteristics for the given character class."""
     return class_characteristics.get(character_class, None)
-
 
 def get_optimal_race(character_class):
     """Return the character race that is most associated with the given character class."""
@@ -279,7 +389,6 @@ def get_optimal_race(character_class):
         return optimal_races
     return best_races
 
-
 def get_character_class(character_race):
     """Return the character class that is most associated with the given character race."""
     if character_race not in race_feats:
@@ -293,7 +402,7 @@ def get_character_class(character_race):
     optimal_classes = []
 
     for character_class, feats in class_characteristics.items():
-        if feats["main"] == main_feat and feats["secondary"] == secondary_feat:
+        if  feats["main"] == main_feat and feats["secondary"] == secondary_feat:
             best_classes.append(character_class)
         if feats["main"] == main_feat:
             optimal_classes.append(character_class)
@@ -307,7 +416,6 @@ def get_character_class(character_race):
         return optimal_classes
 
     return best_classes
-
 
 def get_character_background(character_race, character_class):
     """Return the character background that is most associated with the given character race and class."""
@@ -330,14 +438,11 @@ def get_character_background(character_race, character_class):
     optimal_backgrounds = []
 
     for background, traits in background_feats.items():
-        if traits["main"] == class_main_feat and traits["main"] == race_main_feat and traits[
-            "secondary"] == class_secondary_feat and traits["secondary"] == race_secondary_feat:
+        if traits["main"] == class_main_feat and traits["main"] == race_main_feat and traits["secondary"] == class_secondary_feat and traits["secondary"] == race_secondary_feat:
             best_backgrounds.append(background)
-        if (traits["main"] == class_main_feat or traits["main"] == race_main_feat) and (
-                traits["secondary"] == class_secondary_feat or traits["secondary"] == race_secondary_feat):
+        if (traits["main"] == class_main_feat or traits["main"] == race_main_feat) and (traits["secondary"] == class_secondary_feat or traits["secondary"] == race_secondary_feat):
             optimal_backgrounds.append(background)
-        elif (traits["main"] != race_main_feat and traits["main"] != class_main_feat) and (
-                traits["secondary"] == class_secondary_feat and traits["secondary"] == race_secondary_feat):
+        elif (traits["main"] != race_main_feat and traits["main"] != class_main_feat) and (traits["secondary"] == class_secondary_feat and traits["secondary"] == race_secondary_feat):
             optimal_backgrounds.append(background)
 
     if not optimal_backgrounds and not best_backgrounds:
@@ -348,12 +453,11 @@ def get_character_background(character_race, character_class):
 
     return best_backgrounds
 
-
 def generate_character_attributes(character_class):
     """Generate random gender, age, and subclass for a character."""
 
     # List of genders
-    genders = ("Male", "Female", "Not stated")
+    genders = ["Male", "Female", "Not stated"]
 
     # Generate a random gender
     gender = random.choice(genders)
@@ -385,18 +489,15 @@ def generate_character_attributes(character_class):
         "Personality Trait": personality_trait
     }
 
-
 def get_random_class():
     """Randomly select a character class from the predefined classes."""
     classes = list(subclass_dict.keys())
     return random.choice(classes)
 
-
 def get_random_race():
     """Randomly select a character race from the predefined races."""
     races = list(race_feats.keys())
     return random.choice(races)
-
 
 def add_race_and_background_bonuses(assigned_scores, character_race, character_background):
     """Add racial and background bonuses to the character's ability scores."""
@@ -435,8 +536,28 @@ def add_race_and_background_bonuses(assigned_scores, character_race, character_b
 
     return assigned_scores
 
+# Create query to db to fetch list of spells
+def get_spells(class_name, subclass_name, level):
+    db = sq.connect("/home/rukaton/Studd/dev_days_2024/test_db/dnd_bot.db") #change according to db file path
+    cur = db.cursor()
 
-def random_generation():
+    subclass_name = db_mapping_subclasses[subclass_name]
+
+    query = """
+        SELECT spell_name
+        FROM spells
+        WHERE (classes LIKE ? OR subclasses LIKE ?)
+        AND level <= ?;
+    """
+
+    cur.execute(query, (f"%{class_name.lower()}%", f"%{subclass_name}%", level))
+    spells = [row[0] for row in cur.fetchall()]
+
+    db.close()
+
+    return spells
+
+def random_genaration():
     character = {}
 
     # Get user input
@@ -489,12 +610,12 @@ def random_generation():
         #print("\nRolled Scores:")
         #print(*sorted_scores)
 
-        # Assign the highest and second-highest scores to main and secondary characteristics
+        # Assign the highest and second highest scores to main and secondary characteristics
         main_index = ability_names.index(main_characteristics)
         secondary_index = ability_names.index(secondary_characteristics)
 
         # Create a new scores list with main and secondary scores assigned
-        assigned_scores = [0 for _ in range(6)]
+        assigned_scores = [0] * 6
         assigned_scores[main_index] = main_score
         assigned_scores[secondary_index] = secondary_score
 
@@ -514,16 +635,30 @@ def random_generation():
 
         #print("\nAssigned Ability Scores:")
         for name, score in zip(ability_names, assigned_scores):
-            #print(f"{name}: {score} (Modifier: {calculate_modifier(score)})")  # STATS
             character[name] = f"{score} (modifier: {calculate_modifier(score)})"
+
+        # Level?)
+        level = 1
+        #print(f"\nLevel: {level}")
+        character["Level"] = level
+
+        # Spells
+        # TODO @YanagiRu
+        """character_subclass = character["Subclass"]
+        spells = get_spells(character_class, character_subclass, level)
+
+        if len(spells):
+            print(f"\nSpells for {character_class}, {character_subclass}:")
+            for spell in spells:
+                print(spell)
+        else:
+            print(f"\nNo spells provided for {character_class}, {character_subclass}")"""
 
     else:
         print("Failed trying to generate character.")
+    return
 
-    return character
-
-
-def guided_generation(character_race, character_class, character_subclass, character_background):
+def guided_generation():
     # Get all input information
     """print("\nPlease choose your race - if you don't want to choose just type None")
     character_race = str(input())
@@ -586,7 +721,7 @@ def guided_generation(character_race, character_class, character_subclass, chara
         #print(f"Background: {character_background}")
         character["Background"] = character_background
 
-        # Roll ability scores
+                # Roll ability scores
         scores = roll_ability_scores()
         ability_names = ["Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"]
 
@@ -597,10 +732,11 @@ def guided_generation(character_race, character_class, character_subclass, chara
         #print("\nRolled Scores:")
         #print(*sorted_scores)
 
-        # Assign the highest and second-highest scores to main and secondary characteristics
+        # Assign the highest and second highest scores to main and secondary characteristics
         main_index = ability_names.index(main_characteristics)
         secondary_index = ability_names.index(secondary_characteristics)
 
+        # Create a new scores list with main and secondary scores assigned
         # Create a new scores list with main and secondary scores assigned
         assigned_scores = [0 for _ in range(6)]
         assigned_scores[main_index] = main_score
@@ -627,21 +763,18 @@ def guided_generation(character_race, character_class, character_subclass, chara
 
     else:
         print("Failed trying to generate character.")
-
-    return character
-
+    return
 
 """def main():
     print("Welcome to the D&D Character Generator!")
     print("Please choose generation mode: random(1) or guided(2)")
     mode = int(input())
     if mode == 1:
-        print(random_generation())
+        random_genaration()
     elif mode == 2:
         guided_generation()
     else:
         print("Please choose correct mode!")
-
 
 if __name__ == "__main__":
     main()"""
