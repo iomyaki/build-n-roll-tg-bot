@@ -1,9 +1,56 @@
 import random
 import sqlite3 as sq
 
+
+#Dictionary with rules of have many spells are known to class at his level
+class_known_spells = {
+    "Artificer": {"quantity": "{intelligence_modifier} + {level}", "max_level": [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5]},
+    "Barbarian": {"quantity": [], "max_level": []}, #no spells for class at all
+    "Bard": {"quantity": [4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 15, 16, 18, 19, 19, 20, 22, 22, 22], "max_level": [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 9, 9]},
+    "Cleric": {"quantity": "{wisdom_modifier} + {level}", "max_level": [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 9, 9]},
+    "Druid": {"quantity": "{wisdom_modifier} + {level}", "max_level": [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 9, 9]},
+    "Fighter": {"quantity": [], "max_level": []}, #no spells for class at all
+    "Monk": {"quantity": [], "max_level": []}, #no spells for class at all
+    "Paladin": {"quantity": "{charisma_modifier} + ceil(0.5*{level})", "max_level": [0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5]},
+    "Ranger": {"quantity": [0, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11], "max_level": [0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5]},
+    "Rogue": {"quantity": [], "max_level": []}, #no spells for class at all
+    "Sorcerer": {"quantity": [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12, 13, 13, 14, 14, 15, 15, 15, 15], "max_level": [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 9, 9]},
+    "Warlock": {"quantity": [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15], "max_level": [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]},
+    "Wizard": {"quantity": "{intelligence_modifier} + {level}", "max_level": [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 9, 9]},
+}
+
+def get_quantity(mod, level, class_name):
+    match class_name:
+        case "Artificer":
+            return mod + level
+        case "Cleric":
+            return mod + level
+        case "Druid":
+            return mod + level
+        case "Paladin":
+            return mod + int(level/2)
+        case "Wizard":
+            return mod + level
+
+#Dictionary with rules of have many cantrips are known to class at his level
+class_known_cantrips = {
+    "Artificer": {"quantity": [2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4]},
+    "Barbarian": {"quantity": []}, #can't cast as far as i see
+    "Bard": {"quantity": [2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]},
+    "Cleric": {"quantity": [3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]},
+    "Druid": {"quantity": [2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]},
+    "Fighter": {"quantity": []}, #can't cast as far as i see
+    "Monk": {"quantity": []}, #can't cast as far as i see
+    "Paladin": {"quantity": []}, #can't cast as far as i see
+    "Ranger": {"quantity": []}, #can't cast as far as i see
+    "Rogue": {"quantity": []}, #can't cast as far as i see
+    "Sorcerer": {"quantity": [4, 4, 4, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]},
+    "Warlock": {"quantity": [2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]},
+    "Wizard": {"quantity": [3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]},
+}
+
 # Dictionary mapping D&D classes to their main and secondary characteristics
 class_characteristics = {
-    "Artificer": {"main": "Intelligence", "secondary": "Constitution"},
     "Barbarian": {"main": "Strength", "secondary": "Constitution"},
     "Bard": {"main": "Charisma", "secondary": "Dexterity"},
     "Cleric": {"main": "Wisdom", "secondary": "Constitution"},
@@ -537,25 +584,58 @@ def add_race_and_background_bonuses(assigned_scores, character_race, character_b
     return assigned_scores
 
 # Create query to db to fetch list of spells
-def get_spells(class_name, subclass_name, level):
-    db = sq.connect("/home/rukaton/Studd/dev_days_2024/test_db/dnd_bot.db") #change according to db file path
+def get_spells(class_name, subclass_name, level, scores):
+    """Create query to db to fetch list of spells"""
+    db = sq.connect("app/dnd_test.db") #change according to db file path
     cur = db.cursor()
+
+    number_of_spells = class_known_spells[class_name]
+
+    if len(number_of_spells['quantity']) == 0:
+        spell_limit = 0
+    elif len(number_of_spells['quantity']) == 20:
+        spell_limit = number_of_spells['quantity'][level]
+    else:
+        #print(scores)
+        mod = (number_of_spells['quantity'].split('_')[0][1:]).capitalize()
+        mod = calculate_modifier(scores[mod])
+        spell_limit = get_quantity(mod, level, class_name)
+
+    
+    if len(number_of_spells['max_level']) == 0:
+        spell_level = 0
+    else:
+        spell_level = number_of_spells['max_level'][level]
+
+    print(spell_limit)
+    print(spell_level)
+
 
     subclass_name = db_mapping_subclasses[subclass_name]
 
     query = """
-        SELECT spell_name
-        FROM spells
-        WHERE (classes LIKE ? OR subclasses LIKE ?)
+        SELECT spell_name, rating
+        FROM spells 
+        WHERE (classes LIKE ? OR subclasses LIKE ?) 
         AND level <= ?;
     """
 
-    cur.execute(query, (f"%{class_name.lower()}%", f"%{subclass_name}%", level))
-    spells = [row[0] for row in cur.fetchall()]
+    cur.execute(query, (f"%{class_name.lower()}%", f"%{subclass_name}%", spell_level))
 
-    db.close()
+    output = cur.fetchall()
+    #print(output)
 
-    return spells
+    spells = {row[0]: row[1] for row in output}
+    #print(spells)
+    #print(spells.keys())
+    sorted_spell_list = [k for k, v in sorted(spells.items(), key=lambda item: item[1])]
+    #print(sorted_spell_list)
+
+    if len(list(spells.keys())) == 0:
+        return []
+    
+    #random.shuffle(list(spells.keys()))
+    return sorted_spell_list[-spell_limit:]
 
 def random_generation():
     character = {}
@@ -634,30 +714,29 @@ def random_generation():
         # Control that each of assigned scores not more than 20
 
         #print("\nAssigned Ability Scores:")
+        ability_modifiers = {}
         for name, score in zip(ability_names, assigned_scores):
+            ability_modifiers.update({name: score})
             character[name] = f"{score} (modifier: {calculate_modifier(score)})"
 
         # Level?)
-        level = 1
-        #print(f"\nLevel: {level}")
-        character["Level"] = level
+        level = random.randint(1,20)
+        print(f"\nLevel: {level}")
 
         # Spells
-        # TODO @YanagiRu
-        """character_subclass = character["Subclass"]
-        spells = get_spells(character_class, character_subclass, level)
+        character_subclass = character["Subclass"]
+        spells = get_spells(character_class, character_subclass, level, ability_modifiers)
 
         if len(spells):
             print(f"\nSpells for {character_class}, {character_subclass}:")
             for spell in spells:
-                print(spell)
+                print(spell.replace('_', ' ').capitalize())
         else:
-            print(f"\nNo spells provided for {character_class}, {character_subclass}")"""
+            print(f"\nNo spells provided for {character_class}, {character_subclass}")
 
     else:
         print("Failed trying to generate character.")
-
-    return character
+    return
 
 def guided_generation(character_race, character_class, character_subclass, character_background):
     # Get all input information
@@ -758,7 +837,9 @@ def guided_generation(character_race, character_class, character_subclass, chara
         # Control that each of assigned scores not more than 20
 
         #print("\nAssigned Ability Scores:")
+        ability_modifiers = {}
         for name, score in zip(ability_names, assigned_scores):
+            ability_modifiers.update({name: score})
             #print(f"{name}: {score} (Modifier: {calculate_modifier(score)})")
             character[name] = f"{score} (modifier: {calculate_modifier(score)})"
 
@@ -767,16 +848,17 @@ def guided_generation(character_race, character_class, character_subclass, chara
 
     return character
 
-"""def main():
+def main():
     print("Welcome to the D&D Character Generator!")
     print("Please choose generation mode: random(1) or guided(2)")
-    mode = int(input())
+    random_generation()
+"""    mode = int(input())
     if mode == 1:
         random_genaration()
     elif mode == 2:
         guided_generation()
     else:
-        print("Please choose correct mode!")
+        print("Please choose correct mode!")"""
 
 if __name__ == "__main__":
-    main()"""
+    main()
