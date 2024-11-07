@@ -59,7 +59,10 @@ async def handle_creation_mode(message: Message, state: FSMContext) -> None:
         summary = f"Form completed!\n\nYour character:"
         cnt = 1
         for key, value in character.items():
-            summary += f"\n{cnt}. {key}: {value}."
+            if key == "Spells":
+                summary += f"\n{cnt}. {key}: {', '.join([spell.replace('_', ' ').title() for spell in value])}."
+            else:
+                summary += f"\n{cnt}. {key}: {value}."
             cnt += 1
 
         # send the message

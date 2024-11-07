@@ -1,5 +1,6 @@
 import random
 import sqlite3 as sq
+
 import numpy as np
 
 
@@ -606,16 +607,14 @@ def get_spells(class_name, subclass_name, level, scores):
         mod = (number_of_spells['quantity'].split('_')[0][1:]).capitalize()
         mod = calculate_modifier(scores[mod])
         spell_limit = get_quantity(mod, level, class_name)
-
     
     if len(number_of_spells['max_level']) == 0:
         spell_level = 0
     else:
         spell_level = number_of_spells['max_level'][level]
 
-    print(spell_limit)
-    print(spell_level)
-
+    #print(spell_limit)
+    #print(spell_level)
 
     subclass_name = db_mapping_subclasses[subclass_name]
 
@@ -696,12 +695,12 @@ def random_generation():
         #print("\nRolled Scores:")
         #print(*sorted_scores)
 
-        # Assign the highest and second highest scores to main and secondary characteristics
+        # Assign the highest and second-highest scores to main and secondary characteristics
         main_index = ability_names.index(main_characteristics)
         secondary_index = ability_names.index(secondary_characteristics)
 
         # Create a new scores list with main and secondary scores assigned
-        assigned_scores = [0] * 6
+        assigned_scores = [0 for _ in range(6)]
         assigned_scores[main_index] = main_score
         assigned_scores[secondary_index] = secondary_score
 
@@ -727,22 +726,26 @@ def random_generation():
 
         # Level?)
         level = random.randint(1,20)
-        print(f"\nLevel: {level}")
+        #print(f"\nLevel: {level}")
+        character["Level"] = level
 
         # Spells
         character_subclass = character["Subclass"]
         spells = get_spells(character_class, character_subclass, level, ability_modifiers)
 
-        if len(spells):
-            print(f"\nSpells for {character_class}, {character_subclass}:")
+        character["Spells"] = spells
+
+        """if len(spells):
+            #print(f"\nSpells for {character_class}, {character_subclass}:")
             for spell in spells:
                 print(spell.replace('_', ' ').capitalize())
         else:
-            print(f"\nNo spells provided for {character_class}, {character_subclass}")
+            print(f"\nNo spells provided for {character_class}, {character_subclass}")"""
 
     else:
         print("Failed trying to generate character.")
-    return
+
+    return character
 
 def guided_generation(character_race, character_class, character_subclass, character_background):
     # Get all input information

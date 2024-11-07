@@ -104,4 +104,4 @@ async def add_user_character(character_dict: dict, user: User) -> None:
 
 
 async def get_spells(class_name, subclass_name, level) -> None:
-    
+    pass
