@@ -420,11 +420,8 @@ def get_character_class(character_race):
 def get_character_background(character_race, character_class):
     """Return the character background that is most associated with the given character race and class."""
 
-    if character_race not in race_feats:
-        return ["Unknown character race"]
-
-    if character_class not in class_characteristics:
-        return ["Unknown character class"]
+    if character_race not in race_feats or character_class not in class_characteristics:
+        return ["Unknown background"]
 
     race_feats_data = race_feats[character_race]
     class_feats_data = class_characteristics[character_class]
@@ -448,7 +445,7 @@ def get_character_background(character_race, character_class):
     print(optimal_backgrounds)
 
     if not optimal_backgrounds and not best_backgrounds:
-        return ["No optimal background found for this race and class"]
+        return ["Unknown background"]
 
     if not best_backgrounds:
         return optimal_backgrounds
