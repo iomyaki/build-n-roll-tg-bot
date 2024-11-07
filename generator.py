@@ -557,7 +557,7 @@ def get_spells(class_name, subclass_name, level):
 
     return spells
 
-def random_genaration():
+def random_generation():
     character = {}
 
     # Get user input
@@ -656,9 +656,10 @@ def random_genaration():
 
     else:
         print("Failed trying to generate character.")
-    return
 
-def guided_generation():
+    return character
+
+def guided_generation(character_race, character_class, character_subclass, character_background):
     # Get all input information
     """print("\nPlease choose your race - if you don't want to choose just type None")
     character_race = str(input())
@@ -763,7 +764,8 @@ def guided_generation():
 
     else:
         print("Failed trying to generate character.")
-    return
+
+    return character
 
 """def main():
     print("Welcome to the D&D Character Generator!")
