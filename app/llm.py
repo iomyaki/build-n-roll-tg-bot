@@ -1,10 +1,15 @@
-import random
-import requests
 import base64
+import os
+import requests
 import time
 
-catalog_id = 'b1glk8jqpe4b0vqet2ao'
-apikey = 'AQVN3Om8LWbcmqZMziIyTBhJOCrj7ubBJrlJVl13'
+from dotenv import load_dotenv
+
+dotenv_path = os.path.join(os.path.dirname(__file__), '..', '.env')
+load_dotenv(dotenv_path)
+
+catalog_id = os.getenv('CATALOG_ID')
+apikey = os.getenv('API_KEY')
 
 
 def generate_quenta(race, char_class, gender, age, keywords):
