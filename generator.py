@@ -602,7 +602,7 @@ def get_spells(class_name, subclass_name, level, scores):
     if len(number_of_spells['quantity']) == 0:
         spell_limit = 0
     elif len(number_of_spells['quantity']) == 20:
-        spell_limit = number_of_spells['quantity'][level]
+        spell_limit = number_of_spells['quantity'][level-1]
     else:
         #print(scores)
         mod = (number_of_spells['quantity'].split('_')[0][1:]).capitalize()
@@ -612,7 +612,7 @@ def get_spells(class_name, subclass_name, level, scores):
     if len(number_of_spells['max_level']) == 0:
         spell_level = 0
     else:
-        spell_level = number_of_spells['max_level'][level]
+        spell_level = number_of_spells['max_level'][level-1]
 
     #print(spell_limit)
     #print(spell_level)
