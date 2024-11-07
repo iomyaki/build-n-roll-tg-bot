@@ -18,7 +18,13 @@ def generate_quenta(race, char_class, gender, age, keywords):
         "messages": [
             {
                 "role": "user",
-                "text": "Я создаю нового персонажа для игры в D&D. Мне нужно придумать интересную и подробную историю моего персонажа, историю его жизни, почему он ступил на тропу приключений. Придумай имя и прошлое моего D&D персонажа по ключевым словам: "
+                "text": "Я создаю нового персонажа для игры в D&D. "
+                        "Мне нужно придумать интересную и подробную историю моего персонажа, "
+                        "историю его жизни, почему он ступил на тропу приключений. "
+                        f"Раса моего персонажа — {race}, класс — {char_class}, пол — {gender}, возраст — {age} лет. "
+                        f"Придумай имя и опиши прошлое моего D&D-персонажа на красивом литературном русском языке по "
+                        f"ключевым словам: {keywords}. Не указывай в конце сообщения, что это лишь пример истории "
+                        f"и подобное."
             }
         ]
     }
@@ -30,7 +36,10 @@ def generate_quenta(race, char_class, gender, age, keywords):
     }
 
     response = requests.post(url, headers=headers, json=prompt)
-    return response.text
+    result = response.json()
+    assistant_text = result["result"]["alternatives"][0]["message"]["text"]
+
+    return assistant_text
 
 
 def generate_portrait(prompt, seed, attempts=30):
@@ -61,7 +70,6 @@ def generate_portrait(prompt, seed, attempts=30):
 
     try:
         return create_request.json()['error']
-
     except:
         pass
 
