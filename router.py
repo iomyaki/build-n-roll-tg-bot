@@ -13,10 +13,11 @@ from app import kb
 from app import llm
 
 r = Router()
-spells = [
+"""spells = [
     "Acid Splash", "Blade Ward", "Booming Blade", "Chill Touch", "Control Flames", "Create Bonfire", "Dancing Lights",
     "Druidcraft", "Eldritch Blast", "Encode Thoughts",
-]
+]"""
+spells_formatted = []
 
 
 class Form(StatesGroup):
@@ -99,7 +100,7 @@ async def handle_race(message: Message, state: FSMContext) -> None:
     reply = ""
 
     if message.text.lower() == 'random':
-        await bot.send_dice(message.chat.id, emoji='🎲')
+        await bot.send_dice(message.chat.id, emoji="🎲")
         selected_race = random.choice(list(generator.race_feats))
         reply = f"You character's race is {selected_race}\n"
     else:
@@ -186,6 +187,8 @@ async def handle_subclass(message: Message, state: FSMContext) -> None:
 
 @r.message(Form.background)
 async def handle_background(message: Message, state: FSMContext) -> None:
+    global spells_formatted
+
     bot = message.bot
 
     user_data = await state.get_data()
@@ -207,24 +210,7 @@ async def handle_background(message: Message, state: FSMContext) -> None:
 
     await state.update_data(answer_background=selected_background)
 
-    await bot.send_poll(
-        chat_id=message.chat.id,
-        question="Select spells for your character to cast:",
-        options=spells,
-        is_anonymous=False,
-        allows_multiple_answers=True,
-        type=PollType.REGULAR,
-        reply_markup=ReplyKeyboardRemove(),
-    )
-
-    await state.set_state(Form.spells)
-
-
-@r.poll_answer(Form.spells)
-async def handle_spells(poll_answer: PollAnswer, state: FSMContext) -> None:
-    await state.update_data(answer_spells=(spells[i] for i in poll_answer.option_ids))
-
-    # get character's parameters
+    # generate character characteristics
     data = await state.get_data()
     character = generator.guided_generation(
         data["answer_race"],
@@ -233,19 +219,61 @@ async def handle_spells(poll_answer: PollAnswer, state: FSMContext) -> None:
         data["answer_background"],
     )
 
-    # fill the form with generated data
     await state.update_data(
         answer_gender=character["Gender"],
         answer_age=character["Age"],
+        answer_character=character,
     )
+
+    # generate recommended spells
+    spells = generator.get_spells(
+        character["Class"],
+        character["Subclass"],
+        character["Level"],
+        character["Modifiers"],
+    )
+    spells_formatted = [spell.replace("_", " ").title() for spell in spells][:10]
+
+    if len(spells_formatted) > 1:
+        # start poll to choose recommended spells
+        await bot.send_poll(
+            chat_id=message.chat.id,
+            question="Select spells for your character to cast:",
+            options=spells_formatted,
+            is_anonymous=False,
+            allows_multiple_answers=True,
+            type=PollType.REGULAR,
+            reply_markup=ReplyKeyboardRemove(),
+        )
+
+        await state.set_state(Form.spells)
+    else:
+        await state.update_data(answer_spells=None)
+        await handle_spells()
+
+
+@r.poll_answer(Form.spells)
+async def handle_spells(poll_answer: PollAnswer, state: FSMContext) -> None:
+    # receive poll answers
+    if poll_answer:
+        await state.update_data(answer_spells=(spells_formatted[i] for i in poll_answer.option_ids))
+
+    # get character's parameters
+    data = await state.get_data()
+    character = data["answer_character"]
 
     # compose the message
     summary = f"Form completed!\n\nYour character:"
     cnt = 1
     for key, value in character.items():
-        summary += f"\n{cnt}. {key}: {value}."
+        if key == "Modifiers":
+            continue
+        else:
+            summary += f"\n{cnt}. {key}: {value}."
         cnt += 1
-    summary += f"\n{cnt}. Spells: {', '.join(data['answer_spells'])}."
+
+    if data["answer_spells"] is not None:
+        summary += f"\n{cnt}. Spells: {', '.join(data['answer_spells'])}."
 
     # send the message
     await poll_answer.bot.send_message(poll_answer.user.id, summary)

@@ -725,7 +725,7 @@ def random_generation():
             character[name] = f"{score} (modifier: {calculate_modifier(score)})"
 
         # Level?)
-        level = random.randint(1,20)
+        level = random.randint(1, 20)
         #print(f"\nLevel: {level}")
         character["Level"] = level
 
@@ -851,6 +851,11 @@ def guided_generation(character_race, character_class, character_subclass, chara
             ability_modifiers.update({name: score})
             #print(f"{name}: {score} (Modifier: {calculate_modifier(score)})")
             character[name] = f"{score} (modifier: {calculate_modifier(score)})"
+        character["Modifiers"] = ability_modifiers
+
+        level = random.randint(1, 20)
+        # print(f"\nLevel: {level}")
+        character["Level"] = level
 
     else:
         print("Failed trying to generate character.")
