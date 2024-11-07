@@ -5,7 +5,7 @@ from aiogram.enums.poll_type import PollType
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import InputFile, Message, PollAnswer, ReplyKeyboardRemove, FSInputFile
+from aiogram.types import FSInputFile, Message, PollAnswer, ReplyKeyboardRemove
 
 import generator
 from app import database as db
@@ -34,7 +34,8 @@ class Form(StatesGroup):
 @r.message(CommandStart())
 async def command_start_handler(message: Message, state: FSMContext) -> None:
     await message.answer(
-        f"Hello! Would you like to get your character completely random — or would you like to configure them?",
+        "Welcome to D&D Assistant!\n\n"
+        "Would you like to get your character completely random — or would you like to configure them?",
         reply_markup=kb.creation_mode()
     )
     await state.set_state(Form.creation_mode)
