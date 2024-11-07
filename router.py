@@ -1,3 +1,4 @@
+import random
 from aiogram import Router
 from aiogram.enums.poll_type import PollType
 from aiogram.filters import CommandStart
@@ -9,7 +10,7 @@ import generator
 from app import database as db
 from app import kb
 from app import llm
-#from helpers import select_random_from_list
+#from helpers import random.choice
 
 r = Router()
 spells = [
@@ -97,7 +98,7 @@ async def handle_race(message: Message, state: FSMContext) -> None:
 
     if message.text.lower() == 'random':
         await bot.send_dice(message.chat.id, emoji='🎲')
-        selected_race = select_random_from_list(list(generator.race_feats))
+        selected_race = random.choice(list(generator.race_feats))
         reply = f"You character's race is {selected_race}\n"
     else:
         selected_race = message.text
@@ -122,7 +123,7 @@ async def handle_class(message: Message, state: FSMContext) -> None:
 
     if message.text.lower() == "random":
         await bot.send_dice(message.chat.id, emoji="🎲")
-        selected_class = select_random_from_list(list(generator.class_characteristics))
+        selected_class = random.choice(list(generator.class_characteristics))
         reply = f"You character's class is {selected_class}\n"
     else:
         selected_class = message.text
@@ -168,7 +169,7 @@ async def handle_subclass(message: Message, state: FSMContext) -> None:
 
     if message.text.lower() == "random":
         await bot.send_dice(message.chat.id, emoji="🎲")
-        selected_subclass = select_random_from_list(generator.subclass_dict[char_class])
+        selected_subclass = random.choice(generator.subclass_dict[char_class])
         reply = f"You character's subclass is {selected_subclass}\n"
     else:
         selected_subclass = message.text
@@ -197,7 +198,7 @@ async def handle_background(message: Message, state: FSMContext) -> None:
 
     if message.text.lower() == "random":
         await bot.send_dice(message.chat.id, emoji="🎲")
-        selected_background = select_random_from_list(possible_backgrounds)
+        selected_background = random.choice(possible_backgrounds)
         await message.answer(f"You character's subclass is {selected_background}")
     else:
         selected_background = message.text
