@@ -9,6 +9,8 @@ from aiogram.types import Message, PollAnswer, ReplyKeyboardRemove
 import generator
 from app import database as db
 from app import kb
+from app import llm
+#from helpers import random.choice
 
 r = Router()
 spells = [
@@ -22,8 +24,13 @@ class Form(StatesGroup):
     race = State()
     char_class = State()
     subclass = State()
+    #gender = State()
+    #age = State()
     background = State()
     spells = State()
+    llm = State()
+    quenta = State()
+    portrait = State()
 
 
 @r.message(CommandStart())
@@ -41,6 +48,14 @@ async def handle_creation_mode(message: Message, state: FSMContext) -> None:
         # generate random parameters
         character = generator.random_generation()
 
+        # fill the form with generated data
+        await state.update_data(
+            answer_race=character["Race"],
+            answer_class=character["Class"],
+            answer_gender=character["Gender"],
+            answer_age=character["Age"],
+        )
+
         # compose the message
         summary = f"Form completed!\n\nYour character:"
         cnt = 1
@@ -50,9 +65,14 @@ async def handle_creation_mode(message: Message, state: FSMContext) -> None:
 
         # send the message
         await message.answer(summary, reply_markup=ReplyKeyboardRemove())
+        await message.answer(
+            "Now you can generate a quenta or a portrait for your character, or quit",
+            reply_markup=kb.use_llm()
+        )
 
         # clear the FSM
-        await state.clear()
+        #await state.clear()
+        await state.set_state(Form.llm)
     elif message.text == "Guided":
         await message.answer("Select the race of your character:", reply_markup=kb.select_race())
         await state.set_state(Form.race)
@@ -66,7 +86,7 @@ async def handle_creation_mode(message: Message, state: FSMContext) -> None:
 @r.message(Form.race)
 async def handle_race(message: Message, state: FSMContext) -> None:
     bot = message.bot
-    
+
     if message.text not in generator.race_feats and message.text.lower() != "random":
         await message.answer(
             "Your input is not supported. Please select the race of your character:",
@@ -91,32 +111,33 @@ async def handle_race(message: Message, state: FSMContext) -> None:
 @r.message(Form.char_class)
 async def handle_class(message: Message, state: FSMContext) -> None:
     bot = message.bot
-    
+
     if message.text not in generator.class_characteristics and message.text.lower() != "random":
         await message.answer(
             "Your input is not supported. Please the class of your character:",
             reply_markup=kb.select_class(),
         )
         return
-    
+
     reply = ""
 
-    if message.text.lower() == 'random':
-        await bot.send_dice(message.chat.id, emoji='🎲')
+    if message.text.lower() == "random":
+        await bot.send_dice(message.chat.id, emoji="🎲")
         selected_class = random.choice(list(generator.class_characteristics))
         reply = f"You character's class is {selected_class}\n"
     else:
         selected_class = message.text
 
     await state.update_data(answer_class=selected_class)
-    await message.answer(reply + "Select the subclass of your character:", reply_markup=kb.select_subclass(selected_class))
+    await message.answer(reply + "Select the subclass of your character:",
+                         reply_markup=kb.select_subclass(selected_class))
     await state.set_state(Form.subclass)
 
 
 @r.message(Form.subclass)
 async def handle_subclass(message: Message, state: FSMContext) -> None:
     bot = message.bot
-    
+
     user_data = await state.get_data()
     char_class = user_data.get("answer_class")
     char_race = user_data.get("answer_race")
@@ -128,7 +149,6 @@ async def handle_subclass(message: Message, state: FSMContext) -> None:
         )
         await state.set_state(Form.race)
         return
-
 
     if not char_class or char_class not in generator.subclass_dict:
         await message.answer(
@@ -144,11 +164,11 @@ async def handle_subclass(message: Message, state: FSMContext) -> None:
             reply_markup=kb.select_subclass(char_class)
         )
         return
-    
+
     reply = ""
 
-    if message.text.lower() == 'random':
-        await bot.send_dice(message.chat.id, emoji='🎲')
+    if message.text.lower() == "random":
+        await bot.send_dice(message.chat.id, emoji="🎲")
         selected_subclass = random.choice(generator.subclass_dict[char_class])
         reply = f"You character's subclass is {selected_subclass}\n"
     else:
@@ -157,13 +177,15 @@ async def handle_subclass(message: Message, state: FSMContext) -> None:
     await state.update_data(answer_subclass=selected_subclass)
     possible_backgrounds = generator.get_character_background(char_race, char_class)
     await state.update_data(possible_backgrounds=possible_backgrounds)
-    await message.answer(reply + "Select your character's background:", reply_markup=kb.select_background(possible_backgrounds))
+    await message.answer(reply + "Select your character's background:",
+                         reply_markup=kb.select_background(possible_backgrounds))
     await state.set_state(Form.background)
+
 
 @r.message(Form.background)
 async def handle_background(message: Message, state: FSMContext) -> None:
     bot = message.bot
-    
+
     user_data = await state.get_data()
     possible_backgrounds = user_data.get("possible_backgrounds")
 
@@ -173,9 +195,9 @@ async def handle_background(message: Message, state: FSMContext) -> None:
             reply_markup=kb.select_background(possible_backgrounds)
         )
         return
-    
-    if message.text.lower() == 'random':
-        await bot.send_dice(message.chat.id, emoji='🎲')
+
+    if message.text.lower() == "random":
+        await bot.send_dice(message.chat.id, emoji="🎲")
         selected_background = random.choice(possible_backgrounds)
         await message.answer(f"You character's subclass is {selected_background}")
     else:
@@ -209,6 +231,12 @@ async def handle_spells(poll_answer: PollAnswer, state: FSMContext) -> None:
         data["answer_background"],
     )
 
+    # fill the form with generated data
+    await state.update_data(
+        answer_gender=character["Gender"],
+        answer_age=character["Age"],
+    )
+
     # compose the message
     summary = f"Form completed!\n\nYour character:"
     cnt = 1
@@ -221,7 +249,55 @@ async def handle_spells(poll_answer: PollAnswer, state: FSMContext) -> None:
     await poll_answer.bot.send_message(poll_answer.user.id, summary)
 
     # clear the FSM
-    await state.clear()
+    #await state.clear()
+    await state.set_state(Form.llm)
+
+
+@r.message(Form.llm)
+async def handle_llm(message: Message, state: FSMContext) -> None:
+
+    if message.text.lower() == "generate quenta":
+        await message.answer(
+            "Enter keywords to generate character's quenta (separated by comma):",
+            reply_markup=ReplyKeyboardRemove()
+        )
+        await state.set_state(Form.quenta)
+    elif message.text.lower() == "generate portrait":
+        await message.answer(
+            "Enter keywords to generate character's portrait (separated by comma):",
+            reply_markup=ReplyKeyboardRemove()
+        )
+        await state.set_state(Form.portrait)
+    elif message.text.lower() == "quit":
+        await message.answer("Farewell! To use the bot again, type /start", reply_markup=ReplyKeyboardRemove())
+        await state.clear()
+        return
+    else:
+        await message.answer(
+            "Your input is not supported. Please select one of the options:",
+            reply_markup=kb.use_llm()
+        )
+        return
+
+
+@r.message(Form.quenta)
+async def handle_quenta(message: Message, state: FSMContext) -> None:
+    data = await state.get_data()
+    quenta = llm.generate_quenta(
+        data["answer_race"],
+        data["answer_class"],
+        data["answer_gender"],
+        data["answer_age"],
+        message.text,
+    )
+    await message.answer("Here's the story of your character:", reply_markup=ReplyKeyboardRemove())
+    await message.answer(quenta, reply_markup=kb.use_llm())
+    await state.set_state(Form.llm)
+
+
+@r.message(Form.portrait)
+async def handle_portrait(message: Message, state: FSMContext) -> None:
+    pass
 
 
 @r.message()

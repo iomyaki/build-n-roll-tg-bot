@@ -72,6 +72,7 @@ def use_llm() -> ReplyKeyboardMarkup:
         keyboard=[
             [KeyboardButton(text="Generate quenta")],
             [KeyboardButton(text="Generate portrait")],
-            [KeyboardButton(text="Skip")],
-        ]
+            [KeyboardButton(text="Quit")],
+        ],
+        resize_keyboard=True,
     )
