@@ -51,7 +51,17 @@ def select_class() -> ReplyKeyboardMarkup:
 
 
 def select_subclass(char_class) -> ReplyKeyboardMarkup:
+    keyboard = build_keyboard(5, generator.subclass_dict[char_class])
+    keyboard.append([KeyboardButton(text="Random")])
     return ReplyKeyboardMarkup(
-        keyboard=build_keyboard(5, generator.subclass_dict[char_class]),
+        keyboard=keyboard,
+        resize_keyboard=True,
+    )
+
+def select_background(possible_backgrounds) -> ReplyKeyboardMarkup:
+    keyboard = build_keyboard(5, possible_backgrounds)
+    keyboard.append([KeyboardButton(text="Random")])
+    return ReplyKeyboardMarkup(
+        keyboard=keyboard,
         resize_keyboard=True,
     )
