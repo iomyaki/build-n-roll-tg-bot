@@ -34,15 +34,24 @@ async def command_start_handler(message: Message, state: FSMContext) -> None:
 
 
 @r.message(Form.creation_mode)
-async def random_form(message: Message, state: FSMContext) -> None:
+async def handle_creation_mode(message: Message, state: FSMContext) -> None:
     if message.text == "Random":
-        await message.answer(
-            "Your character form is ready! *sends character form*",
-            reply_markup=ReplyKeyboardRemove(),
-        )
-        # TODO: generate random char here
+        # generate random parameters
+        character = generator.random_generation()
+
+        # compose the message
+        summary = f"Form completed!\n\nYour character:"
+        cnt = 1
+        for key, value in character.items():
+            summary += f"\n{cnt}. {key}: {value}."
+            cnt += 1
+
+        # send the message
+        await message.answer(summary, reply_markup=ReplyKeyboardRemove())
+
+        # clear the FSM
         await state.clear()
-    elif message.text == "Configured":
+    elif message.text == "Guided":
         await message.answer("Select the race of your character:", reply_markup=kb.select_race())
         await state.set_state(Form.race)
     else:
@@ -54,7 +63,7 @@ async def random_form(message: Message, state: FSMContext) -> None:
 
 @r.message(Form.race)
 async def handle_race(message: Message, state: FSMContext) -> None:
-    if message.text not in generator.race_feats:
+    if message.text not in generator.race_feats and message.text.lower() != "random":
         await message.answer(
             "Your input is not supported. Please select the race of your character:",
             reply_markup=kb.select_race(),
@@ -67,7 +76,7 @@ async def handle_race(message: Message, state: FSMContext) -> None:
 
 @r.message(Form.char_class)
 async def handle_class(message: Message, state: FSMContext) -> None:
-    if message.text not in generator.class_characteristics:
+    if message.text not in generator.class_characteristics and message.text.lower() != "random":
         await message.answer(
             "Your input is not supported. Please the class of your character:",
             reply_markup=kb.select_class(),
@@ -119,12 +128,27 @@ async def handle_subclass(message: Message, state: FSMContext) -> None:
 async def handle_spells(poll_answer: PollAnswer, state: FSMContext) -> None:
     await state.update_data(answer_spells=(spells[i] for i in poll_answer.option_ids))
 
+    # get character's parameters
     data = await state.get_data()
-    summary = (f"Form completed!\n\nYour character:"
-               f"\n1. Race: {data['answer_race']}.\n2. Class: {data['answer_class']}."
-               f"\n3. Subclass: {data['answer_subclass']}.\n4. Spells: {', '.join(data['answer_spells'])}.")
+    character = generator.guided_generation(
+        data["answer_race"],
+        data["answer_class"],
+        data["answer_subclass"],
+        "Random"
+    )
 
+    # compose the message
+    summary = f"Form completed!\n\nYour character:"
+    cnt = 1
+    for key, value in character.items():
+        summary += f"\n{cnt}. {key}: {value}."
+        cnt += 1
+    summary += f"\n{cnt}. Spells: {', '.join(data['answer_spells'])}."
+
+    # send the message
     await poll_answer.bot.send_message(poll_answer.user.id, summary)
+
+    # clear the FSM
     await state.clear()
 
 

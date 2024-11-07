@@ -8,14 +8,14 @@ def creation_mode() -> ReplyKeyboardMarkup:
         keyboard=[
             [
                 KeyboardButton(text="Random"),
-                KeyboardButton(text="Configured"),
+                KeyboardButton(text="Guided"),
             ],
         ],
         resize_keyboard=True
     )
 
 
-def generate_keyboard(buttons_in_row: int, iterable: dict or set or list) -> list[list[KeyboardButton]]:
+def build_keyboard(buttons_in_row: int, iterable: dict or set or list) -> list[list[KeyboardButton]]:
     cnt = 0
     keyboard = []
     row = []
@@ -34,20 +34,20 @@ def generate_keyboard(buttons_in_row: int, iterable: dict or set or list) -> lis
 
 def select_race() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
-        keyboard=generate_keyboard(5, generator.race_feats),
+        keyboard=build_keyboard(5, generator.race_feats),
         resize_keyboard=True,
     )
 
 
 def select_class() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
-        keyboard=generate_keyboard(3, generator.class_characteristics),
+        keyboard=build_keyboard(3, generator.class_characteristics),
         resize_keyboard=True,
     )
 
 
 def select_subclass(char_class) -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
-        keyboard=generate_keyboard(5, generator.subclass_dict[char_class]),
+        keyboard=build_keyboard(5, generator.subclass_dict[char_class]),
         resize_keyboard=True,
     )

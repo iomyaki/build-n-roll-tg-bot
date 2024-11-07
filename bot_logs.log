@@ -1,0 +1,7 @@
+INFO (07/11/2024 01:38:52 PM): Bot launched (Line: 54 [main.py])
+INFO (07/11/2024 01:38:52 PM): Start polling (Line: 527 [dispatcher.py])
+INFO (07/11/2024 01:38:52 PM): Run polling for bot @iomy_test_bot id=7942950676 - 'iomyaki Test Bot' (Line: 341 [dispatcher.py])
+INFO (07/11/2024 01:38:55 PM): Update id=242440611 is handled. Duration 327 ms by bot id=7942950676 (Line: 172 [dispatcher.py])
+INFO (07/11/2024 01:38:56 PM): Update id=242440612 is handled. Duration 109 ms by bot id=7942950676 (Line: 172 [dispatcher.py])
+INFO (07/11/2024 01:38:58 PM): Polling stopped (Line: 554 [dispatcher.py])
+INFO (07/11/2024 01:38:58 PM): Polling stopped for bot @iomy_test_bot id=7942950676 - 'iomyaki Test Bot' (Line: 359 [dispatcher.py])
