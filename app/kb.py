@@ -55,3 +55,9 @@ def select_subclass(char_class) -> ReplyKeyboardMarkup:
         keyboard=build_keyboard(5, generator.subclass_dict[char_class]),
         resize_keyboard=True,
     )
+
+def select_background(possible_backgrounds) -> ReplyKeyboardMarkup:
+    return ReplyKeyboardMarkup(
+        keyboard=build_keyboard(5, possible_backgrounds),
+        resize_keyboard=True,
+    )

@@ -419,7 +419,7 @@ def get_character_class(character_race):
 
 def get_random_background():
     backgrounds = list(background_feats)
-    return backgrounds[random.randint(0, len(backgrounds) - 1)]
+    return [backgrounds[random.randint(0, len(backgrounds) - 1)]]
 
 def get_character_background(character_race, character_class):
     """Return the character background that is most associated with the given character race and class."""

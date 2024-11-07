@@ -21,6 +21,7 @@ class Form(StatesGroup):
     race = State()
     char_class = State()
     subclass = State()
+    background = State()
     spells = State()
 
 
@@ -92,8 +93,18 @@ async def handle_class(message: Message, state: FSMContext) -> None:
 async def handle_subclass(message: Message, state: FSMContext) -> None:
     user_data = await state.get_data()
     char_class = user_data.get("answer_class")
+    char_race = user_data.get("answer_race")
 
-    if not char_class:
+    if not char_race:
+        await message.answer(
+            "Error: race is not selected. Please select the race (or restart the bot if this keeps happening):",
+            reply_markup=kb.select_race()
+        )
+        await state.set_state(Form.race)
+        return
+
+
+    if not char_class or char_class not in generator.subclass_dict:
         await message.answer(
             "Error: class is not selected. Please select the class (or restart the bot if this keeps happening):",
             reply_markup=kb.select_class()
@@ -101,15 +112,33 @@ async def handle_subclass(message: Message, state: FSMContext) -> None:
         await state.set_state(Form.char_class)
         return
 
-    if message.text not in generator.subclass_dict[char_class]:
+    if message.text not in generator.subclass_dict[char_class] and message.text.lower() != "random":
         await message.answer(
             "Your input is not supported. Please select the subclass of your character:",
             reply_markup=kb.select_subclass(char_class)
         )
         return
 
-    bot = message.bot
     await state.update_data(answer_subclass=message.text)
+    possible_backgrounds = generator.get_character_background(char_race, char_class)
+    await state.update_data(possible_backgrounds=possible_backgrounds)
+    await message.answer("Select your character's background:", reply_markup=kb.select_background(possible_backgrounds))
+    await state.set_state(Form.background)
+
+@r.message(Form.background)
+async def handle_background(message: Message, state: FSMContext) -> None:
+    user_data = await state.get_data()
+    possible_backgrounds = user_data.get("possible_backgrounds")
+
+    if message.text not in possible_backgrounds and message.text.lower() != "random":
+        await message.answer(
+            "Your input is not supported. Please select the background of your character:",
+            reply_markup=kb.select_background(possible_backgrounds)
+        )
+        return
+
+    bot = message.bot
+    await state.update_data(answer_background=message.text)
 
     await bot.send_poll(
         chat_id=message.chat.id,
@@ -134,7 +163,7 @@ async def handle_spells(poll_answer: PollAnswer, state: FSMContext) -> None:
         data["answer_race"],
         data["answer_class"],
         data["answer_subclass"],
-        "Random"
+        data["answer_background"],
     )
 
     # compose the message
