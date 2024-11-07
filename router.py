@@ -248,15 +248,30 @@ async def handle_background(message: Message, state: FSMContext) -> None:
 
         await state.set_state(Form.spells)
     else:
-        await state.update_data(answer_spells=None)
-        await handle_spells()
+        # compose the message
+        summary = f"Form completed!\n\nYour character:"
+        cnt = 1
+        for key, value in character.items():
+            if key == "Modifiers":
+                continue
+            else:
+                summary += f"\n{cnt}. {key}: {value}."
+            cnt += 1
+
+        # send the message
+        await message.answer(summary, reply_markup=ReplyKeyboardRemove())
+        await message.answer(
+            "Now you can create a quenta and/or a portrait for your character, or quit",
+            reply_markup=kb.use_llm(),
+        )
+
+        await state.set_state(Form.llm)
 
 
 @r.poll_answer(Form.spells)
 async def handle_spells(poll_answer: PollAnswer, state: FSMContext) -> None:
     # receive poll answers
-    if poll_answer:
-        await state.update_data(answer_spells=(spells_formatted[i] for i in poll_answer.option_ids))
+    await state.update_data(answer_spells=(spells_formatted[i] for i in poll_answer.option_ids))
 
     # get character's parameters
     data = await state.get_data()
