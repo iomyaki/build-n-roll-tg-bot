@@ -8,6 +8,7 @@ from aiogram.types import Message, PollAnswer, ReplyKeyboardRemove
 import generator
 from app import database as db
 from app import kb
+from helpers import select_random_from_list
 
 r = Router()
 spells = [
@@ -64,33 +65,58 @@ async def handle_creation_mode(message: Message, state: FSMContext) -> None:
 
 @r.message(Form.race)
 async def handle_race(message: Message, state: FSMContext) -> None:
+    bot = message.bot
+    
     if message.text not in generator.race_feats and message.text.lower() != "random":
         await message.answer(
             "Your input is not supported. Please select the race of your character:",
             reply_markup=kb.select_race(),
         )
         return
-    await state.update_data(answer_race=message.text)
-    await message.answer("Select the class of your character:", reply_markup=kb.select_class())
+
+    reply = ""
+
+    if message.text.lower() == 'random':
+        await bot.send_dice(message.chat.id, emoji='🎲')
+        selected_race = select_random_from_list(list(generator.race_feats))
+        reply = f"You character's race is {selected_race}\n"
+    else:
+        selected_race = message.text
+
+    await state.update_data(answer_race=selected_race)
+    await message.answer(reply + "Select the class of your character:", reply_markup=kb.select_class())
     await state.set_state(Form.char_class)
 
 
 @r.message(Form.char_class)
 async def handle_class(message: Message, state: FSMContext) -> None:
+    bot = message.bot
+    
     if message.text not in generator.class_characteristics and message.text.lower() != "random":
         await message.answer(
             "Your input is not supported. Please the class of your character:",
             reply_markup=kb.select_class(),
         )
         return
-    char_class = message.text
-    await state.update_data(answer_class=char_class)
-    await message.answer("Select the subclass of your character:", reply_markup=kb.select_subclass(char_class))
+    
+    reply = ""
+
+    if message.text.lower() == 'random':
+        await bot.send_dice(message.chat.id, emoji='🎲')
+        selected_class = select_random_from_list(list(generator.class_characteristics))
+        reply = f"You character's class is {selected_class}\n"
+    else:
+        selected_class = message.text
+
+    await state.update_data(answer_class=selected_class)
+    await message.answer(reply + "Select the subclass of your character:", reply_markup=kb.select_subclass(selected_class))
     await state.set_state(Form.subclass)
 
 
 @r.message(Form.subclass)
 async def handle_subclass(message: Message, state: FSMContext) -> None:
+    bot = message.bot
+    
     user_data = await state.get_data()
     char_class = user_data.get("answer_class")
     char_race = user_data.get("answer_race")
@@ -118,15 +144,26 @@ async def handle_subclass(message: Message, state: FSMContext) -> None:
             reply_markup=kb.select_subclass(char_class)
         )
         return
+    
+    reply = ""
 
-    await state.update_data(answer_subclass=message.text)
+    if message.text.lower() == 'random':
+        await bot.send_dice(message.chat.id, emoji='🎲')
+        selected_subclass = select_random_from_list(generator.subclass_dict[char_class])
+        reply = f"You character's subclass is {selected_subclass}\n"
+    else:
+        selected_subclass = message.text
+
+    await state.update_data(answer_subclass=selected_subclass)
     possible_backgrounds = generator.get_character_background(char_race, char_class)
     await state.update_data(possible_backgrounds=possible_backgrounds)
-    await message.answer("Select your character's background:", reply_markup=kb.select_background(possible_backgrounds))
+    await message.answer(reply + "Select your character's background:", reply_markup=kb.select_background(possible_backgrounds))
     await state.set_state(Form.background)
 
 @r.message(Form.background)
 async def handle_background(message: Message, state: FSMContext) -> None:
+    bot = message.bot
+    
     user_data = await state.get_data()
     possible_backgrounds = user_data.get("possible_backgrounds")
 
@@ -136,9 +173,15 @@ async def handle_background(message: Message, state: FSMContext) -> None:
             reply_markup=kb.select_background(possible_backgrounds)
         )
         return
+    
+    if message.text.lower() == 'random':
+        await bot.send_dice(message.chat.id, emoji='🎲')
+        selected_background = select_random_from_list(possible_backgrounds)
+        await message.answer(f"You character's subclass is {selected_background}")
+    else:
+        selected_background = message.text
 
-    bot = message.bot
-    await state.update_data(answer_background=message.text)
+    await state.update_data(answer_background=selected_background)
 
     await bot.send_poll(
         chat_id=message.chat.id,
