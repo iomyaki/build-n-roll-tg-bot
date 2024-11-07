@@ -1,5 +1,6 @@
 import random
 import sqlite3 as sq
+import numpy as np
 
 
 #Dictionary with rules of have many spells are known to class at his level
@@ -96,7 +97,6 @@ race_feats = {
     "Duergar": {"main": "Strength", "secondary": "Constitution"},
     "Eladrin": {"main": "Dexterity", "secondary": "Charisma"},
     "Firbolg": {"main": "Wisdom", "secondary": "Strength"},
-    "Fairy": {"main": "Charisma", "secondary": None},
     "Fire Genasi": {"main": "Intelligence", "secondary": "Charisma"},
     "Githyanki": {"main": "Strength", "secondary": "Intelligence"},
     "Githzerai": {"main": "Wisdom", "secondary": "Intelligence"},
@@ -106,8 +106,6 @@ race_feats = {
     "Kenku": {"main": "Dexterity", "secondary": "Wisdom"},
     "Kobold": {"main": "Dexterity", "secondary": "Intelligence"},
     "Lizardfolk": {"main": "Constitution", "secondary": "Wisdom"},
-    "Minotaur": {"main": "Strength", "secondary": "Constitution"},
-    "Satyr": {"main": "Charisma", "secondary": "Dexterity"},
     "Sea Elf": {"main": "Dexterity", "secondary": "Wisdom"},
     "Shadar-kai": {"main": "Dexterity", "secondary": "Charisma"},
     "Shifter": {"main": "Dexterity", "secondary": "Strength"},
@@ -145,7 +143,6 @@ race_feats = {
     "Erina": {"main": "Charisma", "secondary": "Dexterity"},
     "Quickstep": {"main": "Dexterity", "secondary": "Charisma"},
     "Ratatosk": {"main": "Dexterity", "secondary": "Wisdom"},
-    "Ravenfolk": {"main": "Wisdom", "secondary": "Dexterity"},
     "Satarre": {"main": "Charisma", "secondary": "Intelligence"},
     "Shade": {"main": "Dexterity", "secondary": "Charisma"},
     "Shadow Goblin": {"main": "Dexterity", "secondary": "Charisma"},
@@ -464,14 +461,15 @@ def get_character_class(character_race):
 
     return best_classes
 
+def get_random_background():
+    backgrounds = list(background_feats)
+    return [backgrounds[random.randint(0, len(backgrounds) - 1)]]
+
 def get_character_background(character_race, character_class):
     """Return the character background that is most associated with the given character race and class."""
 
-    if character_race not in race_feats:
-        return "Unknown character race"
-
-    if character_class not in class_characteristics:
-        return "Unknown character class"
+    if character_race not in race_feats or character_class not in class_characteristics:
+        return get_random_background()
 
     race_feats_data = race_feats[character_race]
     class_feats_data = class_characteristics[character_class]
@@ -481,24 +479,29 @@ def get_character_background(character_race, character_class):
     class_main_feat = class_feats_data["main"]
     class_secondary_feat = class_feats_data["secondary"]
 
-    best_backgrounds = []
     optimal_backgrounds = []
+    suboptimal_backgrounds = []
 
     for background, traits in background_feats.items():
-        if traits["main"] == class_main_feat and traits["main"] == race_main_feat and traits["secondary"] == class_secondary_feat and traits["secondary"] == race_secondary_feat:
-            best_backgrounds.append(background)
-        if (traits["main"] == class_main_feat or traits["main"] == race_main_feat) and (traits["secondary"] == class_secondary_feat or traits["secondary"] == race_secondary_feat):
+        main_feat_full_match = traits["main"] == class_main_feat and traits["main"] == race_main_feat
+        main_feat_half_match = traits["main"] == class_main_feat or traits["main"] == race_main_feat
+        
+        secondary_feat_full_match = traits["secondary"] == class_secondary_feat and traits["secondary"] == race_secondary_feat
+        secondary_feat_half_match = traits["secondary"] == class_secondary_feat or traits["secondary"] == race_secondary_feat
+        
+        if main_feat_full_match and secondary_feat_full_match:
             optimal_backgrounds.append(background)
-        elif (traits["main"] != race_main_feat and traits["main"] != class_main_feat) and (traits["secondary"] == class_secondary_feat and traits["secondary"] == race_secondary_feat):
-            optimal_backgrounds.append(background)
+        
+        if main_feat_half_match and secondary_feat_half_match or main_feat_full_match or secondary_feat_full_match:
+            suboptimal_backgrounds.append(background)
 
-    if not optimal_backgrounds and not best_backgrounds:
-        return "No optimal background found for this race and class"
-
-    if not best_backgrounds:
+    if optimal_backgrounds:
         return optimal_backgrounds
-
-    return best_backgrounds
+    
+    if suboptimal_backgrounds:
+        return suboptimal_backgrounds
+    
+    return get_random_background()
 
 def generate_character_attributes(character_class):
     """Generate random gender, age, and subclass for a character."""
@@ -510,7 +513,10 @@ def generate_character_attributes(character_class):
     gender = random.choice(genders)
 
     # Generate a random age (example ranges, can be adjusted based on race/class)
-    age = random.randint(18, 100)  # Assuming characters can be between 18 and 100 years old
+    age = abs(np.random.normal(20, 30))
+    if age < 18:
+        age += 18
+    age = int(age)
 
     # Personality traits (examples, can be expanded)
     personality_traits = [

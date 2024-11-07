@@ -15,7 +15,7 @@ def creation_mode() -> ReplyKeyboardMarkup:
     )
 
 
-def build_keyboard(buttons_in_row: int, iterable: dict or set or list) -> list[list[KeyboardButton]]:
+def build_keyboard(buttons_in_row: int, iterable: dict | set | list) -> list[list[KeyboardButton]]:
     cnt = 0
     keyboard = []
     row = []
@@ -51,7 +51,28 @@ def select_class() -> ReplyKeyboardMarkup:
 
 
 def select_subclass(char_class) -> ReplyKeyboardMarkup:
+    keyboard = build_keyboard(5, generator.subclass_dict[char_class])
+    keyboard.append([KeyboardButton(text="Random")])
     return ReplyKeyboardMarkup(
-        keyboard=build_keyboard(5, generator.subclass_dict[char_class]),
+        keyboard=keyboard,
+        resize_keyboard=True,
+    )
+
+def select_background(possible_backgrounds) -> ReplyKeyboardMarkup:
+    keyboard = build_keyboard(5, possible_backgrounds)
+    keyboard.append([KeyboardButton(text="Random")])
+    return ReplyKeyboardMarkup(
+        keyboard=keyboard,
+        resize_keyboard=True,
+    )
+
+
+def use_llm() -> ReplyKeyboardMarkup:
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="Generate quenta")],
+            [KeyboardButton(text="Generate portrait")],
+            [KeyboardButton(text="Quit")],
+        ],
         resize_keyboard=True,
     )
