@@ -33,15 +33,19 @@ def build_keyboard(buttons_in_row: int, iterable: dict or set or list) -> list[l
 
 
 def select_race() -> ReplyKeyboardMarkup:
+    keyboard = build_keyboard(5, generator.race_feats)
+    keyboard.append([KeyboardButton(text="Random")])
     return ReplyKeyboardMarkup(
-        keyboard=build_keyboard(5, generator.race_feats),
+        keyboard=keyboard,
         resize_keyboard=True,
     )
 
 
 def select_class() -> ReplyKeyboardMarkup:
+    keyboard = build_keyboard(3, generator.class_characteristics)
+    keyboard.append([KeyboardButton(text="Random")])
     return ReplyKeyboardMarkup(
-        keyboard=build_keyboard(3, generator.class_characteristics),
+        keyboard=keyboard,
         resize_keyboard=True,
     )
 
