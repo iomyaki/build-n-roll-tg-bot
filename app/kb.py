@@ -65,3 +65,13 @@ def select_background(possible_backgrounds) -> ReplyKeyboardMarkup:
         keyboard=keyboard,
         resize_keyboard=True,
     )
+
+
+def use_llm() -> ReplyKeyboardMarkup:
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="Generate quenta")],
+            [KeyboardButton(text="Generate portrait")],
+            [KeyboardButton(text="Skip")],
+        ]
+    )
