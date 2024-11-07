@@ -53,6 +53,7 @@ class_known_cantrips = {
 
 # Dictionary mapping D&D classes to their main and secondary characteristics
 class_characteristics = {
+    "Artificer": {"main": "Intelligence", "secondary": "Constitution"},
     "Barbarian": {"main": "Strength", "secondary": "Constitution"},
     "Bard": {"main": "Charisma", "secondary": "Dexterity"},
     "Cleric": {"main": "Wisdom", "secondary": "Constitution"},
