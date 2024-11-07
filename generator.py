@@ -1,5 +1,6 @@
 import random
 import sqlite3 as sq
+import numpy as np
 
 # Dictionary mapping D&D classes to their main and secondary characteristics
 class_characteristics = {
@@ -469,7 +470,10 @@ def generate_character_attributes(character_class):
     gender = random.choice(genders)
 
     # Generate a random age (example ranges, can be adjusted based on race/class)
-    age = random.randint(18, 100)  # Assuming characters can be between 18 and 100 years old
+    age = abs(np.random.normal(20, 30))
+    if age < 18:
+        age += 18
+    age = int(age)
 
     # Personality traits (examples, can be expanded)
     personality_traits = [
