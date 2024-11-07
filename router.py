@@ -1,16 +1,16 @@
 import random
+
 from aiogram import Router
 from aiogram.enums.poll_type import PollType
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import Message, PollAnswer, ReplyKeyboardRemove
+from aiogram.types import InputFile, Message, PollAnswer, ReplyKeyboardRemove, FSInputFile
 
 import generator
 from app import database as db
 from app import kb
 from app import llm
-#from helpers import random.choice
 
 r = Router()
 spells = [
@@ -24,8 +24,6 @@ class Form(StatesGroup):
     race = State()
     char_class = State()
     subclass = State()
-    #gender = State()
-    #age = State()
     background = State()
     spells = State()
     llm = State()
@@ -247,15 +245,17 @@ async def handle_spells(poll_answer: PollAnswer, state: FSMContext) -> None:
 
     # send the message
     await poll_answer.bot.send_message(poll_answer.user.id, summary)
+    await poll_answer.bot.send_message(
+        poll_answer.user.id,
+        "Now you can create a quenta and/or a portrait for your character, or quit",
+        reply_markup=kb.use_llm()
+    )
 
-    # clear the FSM
-    #await state.clear()
     await state.set_state(Form.llm)
 
 
 @r.message(Form.llm)
 async def handle_llm(message: Message, state: FSMContext) -> None:
-
     if message.text.lower() == "generate quenta":
         await message.answer(
             "Enter keywords to generate character's quenta (separated by comma):",
@@ -297,7 +297,19 @@ async def handle_quenta(message: Message, state: FSMContext) -> None:
 
 @r.message(Form.portrait)
 async def handle_portrait(message: Message, state: FSMContext) -> None:
-    pass
+    data = await state.get_data()
+    prompt = ("frameless, only one single image, one single character without others, detailed full face illustration, "
+              f"close-up portrait, isolated on pure background, race {data['answer_race']}, "
+              f"class {data['answer_class']}, gender {data['answer_gender']}, age {data['answer_age']}, "
+              f"additional info: {message.text}")
+    img = llm.generate_portrait(prompt, random.randint(0, 2000000000))
+    await message.answer("Here's the portrait of your character:", reply_markup=ReplyKeyboardRemove())
+    await message.bot.send_photo(
+        chat_id=message.from_user.id,
+        photo=FSInputFile(path=img),
+        reply_markup=kb.use_llm(),
+    )
+    await state.set_state(Form.llm)
 
 
 @r.message()

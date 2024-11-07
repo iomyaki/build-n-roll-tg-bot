@@ -15,7 +15,7 @@ def creation_mode() -> ReplyKeyboardMarkup:
     )
 
 
-def build_keyboard(buttons_in_row: int, iterable: dict or set or list) -> list[list[KeyboardButton]]:
+def build_keyboard(buttons_in_row: int, iterable: dict | set | list) -> list[list[KeyboardButton]]:
     cnt = 0
     keyboard = []
     row = []
