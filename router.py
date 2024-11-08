@@ -187,8 +187,8 @@ async def handle_subclass(message: Message, state: FSMContext) -> None:
 
 @r.message(Form.background)
 async def handle_background(message: Message, state: FSMContext) -> None:
-    global spells_formatted
-    global spells
+    #global spells_formatted
+    #global spells
 
     bot = message.bot
 
@@ -242,6 +242,9 @@ async def handle_background(message: Message, state: FSMContext) -> None:
     #print(spells)
     spells_formatted = [spell.replace("_", " ").title() for spell in rated_spells][:10]
 
+    await state.update_data(full_spells=spells)
+    await state.update_data(spells_formatted=spells_formatted)
+
     if len(spells_formatted) > 1:
         # start poll to choose recommended spells
         await bot.send_poll(
@@ -278,6 +281,10 @@ async def handle_background(message: Message, state: FSMContext) -> None:
 
 @r.poll_answer(Form.spells)
 async def handle_spells(poll_answer: PollAnswer, state: FSMContext) -> None:
+
+    data = await state.get_data()
+    spells = data.get("full_spells")
+    spells_formatted = data.get("spells_formatted")
     # receive poll answers
     #await state.update_data(answer_spells=(spells_formatted[i] for i in poll_answer.option_ids))
     temp = [spells_formatted[i].lower().replace(' ', '_') for i in poll_answer.option_ids]
@@ -288,7 +295,8 @@ async def handle_spells(poll_answer: PollAnswer, state: FSMContext) -> None:
     limit = len(spells_formatted) - len(temp)
     #rand_spells = [s for s in spells if s not in temp] #exclude already chosen ones
 
-    data = await state.get_data()
+
+    
 
     #exclude spells which we saw already
     rand_spells = [s for s in spells if s.replace("_", " ").title() not in spells_formatted[:10]] 
