@@ -591,12 +591,7 @@ def add_race_and_background_bonuses(assigned_scores, character_race, character_b
 
     return assigned_scores
 
-# Create query to db to fetch list of spells
-def get_spells(class_name, subclass_name, level, scores):
-    """Create query to db to fetch list of spells"""
-    db = sq.connect("app/dnd_test.db") #change according to db file path
-    cur = db.cursor()
-
+def automatic_choose_spells(sorted_spell_list, class_name, level, scores):
     number_of_spells = class_known_spells[class_name]
 
     if len(number_of_spells['quantity']) == 0:
@@ -608,6 +603,28 @@ def get_spells(class_name, subclass_name, level, scores):
         mod = (number_of_spells['quantity'].split('_')[0][1:]).capitalize()
         mod = calculate_modifier(scores[mod])
         spell_limit = get_quantity(mod, level, class_name)
+
+    if len(sorted_spell_list) > spell_limit:
+        #print(f"{spell_limit=}") #TESTING
+        best_spells = sorted_spell_list[-int(spell_limit/4):]
+        random.shuffle(sorted_spell_list)
+        random.shuffle(sorted_spell_list)
+        final_spell_list = set([*sorted_spell_list, *best_spells][-spell_limit:])
+        #print(len(final_spell_list))
+        return final_spell_list
+    #print(sorted_spell_list)
+    
+    #random.shuffle(list(spells.keys()))
+    return sorted_spell_list[-spell_limit:]
+
+
+# Create query to db to fetch list of spells
+def get_spells(class_name, subclass_name, level, scores):
+    """Create query to db to fetch list of spells"""
+    db = sq.connect("app/dnd_test.db") #change according to db file path
+    cur = db.cursor()
+
+    number_of_spells = class_known_spells[class_name]
     
     if len(number_of_spells['max_level']) == 0:
         spell_level = 0
@@ -632,16 +649,14 @@ def get_spells(class_name, subclass_name, level, scores):
     #print(output)
 
     spells = {row[0]: row[1] for row in output}
-    #print(spells)
-    #print(spells.keys())
-    sorted_spell_list = [k for k, v in sorted(spells.items(), key=lambda item: item[1])]
-    #print(sorted_spell_list)
-
     if len(list(spells.keys())) == 0:
         return []
     
-    #random.shuffle(list(spells.keys()))
-    return sorted_spell_list[-spell_limit:]
+    #print(f"{len(spells)=}")
+    #print(spells.keys())
+
+    sorted_spell_list = [k for k, v in sorted(spells.items(), key=lambda item: item[1])]
+    return sorted_spell_list
 
 def random_generation():
     character = {}
@@ -733,8 +748,9 @@ def random_generation():
         # Spells
         character_subclass = character["Subclass"]
         spells = get_spells(character_class, character_subclass, level, ability_modifiers)
+        chosen_spells = automatic_choose_spells(spells, character_class, level, ability_modifiers)
 
-        character["Spells"] = spells
+        character["Spells"] = chosen_spells
 
         """if len(spells):
             #print(f"\nSpells for {character_class}, {character_subclass}:")
