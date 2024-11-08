@@ -66,6 +66,14 @@ def select_background(possible_backgrounds) -> ReplyKeyboardMarkup:
         resize_keyboard=True,
     )
 
+def select_level() -> ReplyKeyboardMarkup:
+    keyboard=build_keyboard(5, [str(x) for x in range(1, 21)])
+    keyboard.append([KeyboardButton(text="Random")])    
+    return ReplyKeyboardMarkup(
+        keyboard=keyboard,
+        resize_keyboard=True,
+    )
+
 
 def use_llm() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
