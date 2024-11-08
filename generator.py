@@ -764,7 +764,7 @@ def random_generation():
 
     return character
 
-def guided_generation(character_race, character_class, character_subclass, character_background):
+def guided_generation(character_race, character_class, character_subclass, character_background, character_level):
     # Get all input information
     """print("\nPlease choose your race - if you don't want to choose just type None")
     character_race = str(input())
@@ -870,9 +870,10 @@ def guided_generation(character_race, character_class, character_subclass, chara
             character[name] = f"{score} (modifier: {calculate_modifier(score)})"
         character["Modifiers"] = ability_modifiers
 
-        level = random.randint(1, 20)
-        # print(f"\nLevel: {level}")
-        character["Level"] = level
+        if character_level.lower() == 'random':
+            character["Level"] = random.randint(1, 20)
+        else:
+            character["Level"] = int(character_level)
 
     else:
         print("Failed trying to generate character.")

@@ -25,6 +25,7 @@ class Form(StatesGroup):
     race = State()
     char_class = State()
     subclass = State()
+    level = State()
     background = State()
     spells = State()
     llm = State()
@@ -187,9 +188,6 @@ async def handle_subclass(message: Message, state: FSMContext) -> None:
 
 @r.message(Form.background)
 async def handle_background(message: Message, state: FSMContext) -> None:
-    global spells_formatted
-    global spells
-
     bot = message.bot
 
     user_data = await state.get_data()
@@ -205,11 +203,42 @@ async def handle_background(message: Message, state: FSMContext) -> None:
     if message.text.lower() == "random":
         await bot.send_dice(message.chat.id, emoji="🎲")
         selected_background = random.choice(possible_backgrounds)
-        await message.answer(f"You character's subclass is {selected_background}")
+        await message.answer(f"You character's background is {selected_background}")
     else:
         selected_background = message.text
 
     await state.update_data(answer_background=selected_background)
+
+    await message.answer(
+        "Select your character's level from 1 to 20:",
+        reply_markup=kb.select_level(),
+    )
+
+    await state.set_state(Form.level)
+
+
+@r.message(Form.level)
+async def handle_level(message: Message, state: FSMContext) -> None:
+    global spells_formatted
+    global spells 
+
+    bot = message.bot
+
+    if message.text not in [str(x) for x in range(1, 21)] and message.text.lower() != "random":
+        await message.answer(
+            "Your input is not supported. Please the character's level from 1 to 20:",
+            reply_markup=kb.select_level(),
+        )
+        return
+
+    if message.text.lower() == "random":
+        await bot.send_dice(message.chat.id, emoji="🎲")
+        selected_level = random.choice([str(x) for x in range(1, 21)])
+        await message.bot.send_message(message.chat.id, f"You character's level is {selected_level}")
+    else:
+        selected_level = message.text
+
+    await state.update_data(answer_level=selected_level)
 
     # generate character characteristics
     data = await state.get_data()
@@ -218,6 +247,7 @@ async def handle_background(message: Message, state: FSMContext) -> None:
         data["answer_class"],
         data["answer_subclass"],
         data["answer_background"],
+        data["answer_level"]
     )
 
     await state.update_data(
