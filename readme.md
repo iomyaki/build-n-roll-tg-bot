@@ -64,6 +64,6 @@ python3 main.py
 
 ## Признание
 
-![Диплом за хакатон](https://github.com/user-attachments/assets/daadb78f-621c-46cc-8292-192af801861a)
-
-
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/daadb78f-621c-46cc-8292-192af801861a" alt="Diploma" style="width:65%; height:auto">
+</div>
