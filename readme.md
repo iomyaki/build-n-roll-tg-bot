@@ -59,4 +59,11 @@ python3 main.py
 Если вы хотите внести свой вклад в проект, пожалуйста, создайте форк репозитория и отправьте пулл-реквест с вашими изменениями.
 
 ## Материалы для презентации
-Также размещаем сслыку на презентацию проекта: https://docs.google.com/presentation/d/1SUfxcJUfvSjAPUVbx636RNYPHiQ619aMU0qOwrFOLC0/edit?usp=sharing
+
+Ссылка на презентацию проекта: https://docs.google.com/presentation/d/1SUfxcJUfvSjAPUVbx636RNYPHiQ619aMU0qOwrFOLC0/edit?usp=sharing
+
+## Признание
+
+![Диплом за хакатон](https://github.com/user-attachments/assets/daadb78f-621c-46cc-8292-192af801861a)
+
+
