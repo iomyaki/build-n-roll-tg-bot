@@ -60,10 +60,15 @@ python3 main.py
 
 ## Материалы для презентации
 
-Ссылка на презентацию проекта: https://docs.google.com/presentation/d/1SUfxcJUfvSjAPUVbx636RNYPHiQ619aMU0qOwrFOLC0/edit?usp=sharing
+Презентация проекта доступна [по ссылке](https://docs.google.com/presentation/d/1SUfxcJUfvSjAPUVbx636RNYPHiQ619aMU0qOwrFOLC0/edit?usp=sharing).
 
 ## Признание
 
 <div align="center">
   <img src="https://github.com/user-attachments/assets/daadb78f-621c-46cc-8292-192af801861a" alt="Diploma" style="width:65%; height:auto">
 </div>
+
+## СМИ о нас
+
+- [«Вспомнить все» и «НытьеМетр»: как прошел осенний хакатон DevDays 2024 — ИПКН ИТМО](https://www.ipkn.itmo.ru/dd-fall2024).
+- [Подземелья, драконы и Telegram-бот — ИПКН ИТМО](https://www.ipkn.itmo.ru/news/podzemelya-drakony-i-telegram-bot).
