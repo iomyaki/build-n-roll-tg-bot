@@ -2,7 +2,7 @@
 
 The "D&D Assistant" Telegram bot brings you the joy of gaming. Not enough time to create a character and only 10 minutes left before the session? Yet again, your GM asks you not to create a fifth human fighter in the party? The "D&D Assistant" is here to help!
 
-The bot is avaiable **[here](https://t.me/dnd_ai_assistant_bot)**.
+The bot is available **[here](https://t.me/dnd_ai_assistant_bot)**.
 
 ## Adventure Description
 
