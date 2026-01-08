@@ -22,23 +22,30 @@ We plan to store spell information in a database, and generate character stats u
 ## Self-hosted Deployment
 
 Clone the repository:
-```bash
+```shell
 git clone https://github.com/iomyaki/build-n-roll-tg-bot.git
 ```
 
+### Using Docker
+
+Build and run the Docker image:
+```shell
+docker compose up --build
+```
+
+### Without Docker
+
 Install the dependencies:
-```bash
+```shell
 pip install -r requirements.txt
 ```
 
-Launch the bot and enjoy the rapid creation of amazing characters!
-```bash
-python main.py
-```
-or
-```bash
+Launch the bot:
+```shell
 python3 main.py
 ```
+
+### Requirements
 
 You will also need to specify your Telegram bot token, as well as API key and CATALOG_ID for YandexGPT, in the `.env` file.
 
