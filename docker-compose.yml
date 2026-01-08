@@ -1,0 +1,9 @@
+version: '3.9'
+
+services:
+  bot:
+    build: .
+    container_name: dnd_bot
+    ports:
+      - "8000:8000"
+    command: ["python", "main.py"]
