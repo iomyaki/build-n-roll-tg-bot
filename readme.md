@@ -1,62 +1,72 @@
-# DDF24 Dungeon Pythons 🎲
+# D&D Assistant TG bot 🎲
 
-❗ Проект, созданный в рамках хакатона ИПКН ИТМО «DevDays Fall 2024».
+The "D&D Assistant" Telegram bot brings you the joy of gaming. Not enough time to create a character and only 10 minutes left before the session? Yet again, your GM asks you not to create a fifth human fighter in the party? The "D&D Assistant" is here to help!
 
-Мы — партия приключенцев «DDF24 Dungeon Pythons». Мы несём вам радость игры. Не успели создать персонажа, а до партии осталось 10 минут? Ваш ГМ в очередной раз просит не создавать пятого в партии человека-воина? Тогда мы идём к вам!
+## Adventure Description
 
-## Описание приключения
+"D&D Assistant" is a solution for character generation in *Dungeons & Dragons*. Our project allows you, via a Telegram bot, to generate a full-fledged, ready-to-play character sheet according to your chosen criteria. The user can either generate a completely random character or fill in some fields on the character sheet and have the rest generated so that they fit with what's already been chosen.
 
-D&D Assistant — это решение для генерации персонажей в игре Dungeons & Dragons. Наш проект позволяет с помощью бота в Telegram сгенерировать полноценный, готовый к игре, лист персонажа по заданным критериям. У пользователя есть возможность сгенерировать либо полностью случайного персонажа, либо заполнить некоторые поля листа персонажа, а остальные сгенерировать так, чтобы они подходили к уже заполненным.
+We know all too well how disappointing it is to create a character you thought was awesome, only to find out they’re absolutely useless because you picked a bunch of unnecessary or downright harmful spells. That’s why we’ve taken the liberty of suggesting a spell list that will make it as easy as possible for you to enjoy game content with your particular character.
 
-Мы прекрасно знаем, насколько грустно бывает, когда вы создаёте крутого (по вашему мнению) персонажа, а он оказывается абсолютно бесполезным из-за того, что вы набрали полный список ненужных или даже бесполезных заклинаний. Поэтому мы взяли на себя смелость предложить вам список заклинаний, с которыми вам будет максимально комфортно осваивать игровой контент в зависимости от вашего персонажа.
+(In the future, we plan to expand the list of available classes and backgrounds in our generator, and also add features to generate dungeon maps or even unexpected plot twists for your adventures.)
 
-В дальнейшем мы планируем расширить доступный в нашем генераторе список классов и происхождений, а также добавить возможность генерировать карты подземелий или даже неожиданные сюжетные повороты для ваших приключений.
+## The Advantages of Our Adventure
 
-## Преимущества нашего приключения
+In addition to a free ticket to the Forgotten Realms, you get:
+- Character backgrounds and avatars generated via YandexGPT API for full role-playing immersion.
+- Access to homebrew and the ability to add your own house rules.
+- The ability to balance stats, spells, and features based on community usefulness ratings.
 
-Помимо бесплатной путёвки в Забытые Королевства вы получите:
-- Генерацию квент и аватаров персонажей через YandexGPT API для полноценного отыгрыша.
-- Доступ к homebrew и добавлению своих правил жизни.
-- Возможность балансировать характеристики, заклинания и способности по рейтингу полезности сообщества.
+We plan to store spell information in a database, and generate character stats using our own algorithm for efficient stat distribution and class/race selection. This way, a character created with our bot is guaranteed to be not only unique, but also comfortable to play in the game world.
 
-Хранить информацию по спеллам предполагаем в базе данных, а генерацию характеристик осуществлять при помощи собственного алгоритма для эффективного распределения характеристик и подбора классов и рас. Таким образом, созданный с помощью нашего бота персонаж гарантированно будет не только уникальным, но и будет комфортно ощущаться в игровом мире.
+## Self-hosted Deployment
 
-## Партия приключенцев
-
-- ГМ (тимлид, реализация алгоритма генерации) — Иван Золотников
-- Колдун (реализация бота) — Иван Мякиньков
-- Воин (реализация БД заклинаний) — Иван Ступницкий
-- Волшебник (реализация работы с API) — Матвей Багров
-- Монах (реализация бота, тестирование) — Александр Крюков
-
-## Установка и использование
-
-Клонируйте репозиторий:
+Clone the repository:
 ```bash
 git clone https://github.com/iomyaki/build-n-roll-tg-bot.git
 ```
 
-Установите зависимости:
+Install the dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-Запустите бота и насладитесь быстрой генерацией прекрасных персонажей!
+Launch the bot and enjoy the rapid creation of amazing characters!
 ```bash
 python main.py
 ```
-или
+or
 ```bash
 python3 main.py
 ```
 
-Для работы также потребуется в файле .env указать токен Telegram-бота, а также API-ключ и CATALOG_ID для работы с YandexGPT.
+You will also need to specify your Telegram bot token, as well as API key and CATALOG_ID for YandexGPT, in the `.env` file.
 
-Для генерации квенты и портрета персонажа вам будет предложено ввести ключевые слова для генеративной модели. Вы можете отправить что угодно, но учитывайте, что написанное повлияет на сгенерированный результат (иногда весьма непредсказуемо). Генерировать квенту и портрет для персонажа можно неограниченное число раз — у вас будет возможность подобрать ключевые слова для наилучшего результата. Количество символов в вашем сообщении с ключевыми словами не должно превышать 500.
+For generating the character’s backstory and portrait, you will be asked to enter keywords for the generative model. You can enter anything, but keep in mind that your input will influence the generated result (sometimes in very unpredictable ways). You can generate a backstory and portrait for a character as many times as you want—it’s possible to adjust the keywords for the best result. The keywords message should not exceed 500 characters.
 
-## Контрибьюция
+## Contribution
 
-Если вы хотите внести свой вклад в проект, пожалуйста, создайте форк репозитория и отправьте пулл-реквест с вашими изменениями.
+If you would like to contribute to the project, please fork the repository and submit a pull request with your changes.
 
-## Материалы для презентации
-Также размещаем сслыку на презентацию проекта: https://docs.google.com/presentation/d/1SUfxcJUfvSjAPUVbx636RNYPHiQ619aMU0qOwrFOLC0/edit?usp=sharing
+## Developers
+
+- GM (team lead, algorithm development) — Ivan Zolotnikov (*Иван Золотников*), [tg](https://t.me/Cat_of_Iello).
+- Warlock (bot development) — Ivan Myakinkov (*Иван Мякиньков*), [tg](https://t.me/iomyaki).
+- Fighter (spell database development) — Ivan Stupnitsky (*Иван Ступницкий*), [tg](https://t.me/YanagiRu).
+- Wizard (API integration) — Matvey Bagrov (*Матвей Багров*), [tg](https://t.me/the_big_bagrovski).
+- Monk (bot development, testing) — Alexander Kryukov (*Александр Крюков*).
+
+## Presentation Materials
+
+The project presentation is available [here](https://docs.google.com/presentation/d/1SUfxcJUfvSjAPUVbx636RNYPHiQ619aMU0qOwrFOLC0/edit?usp=sharing).
+
+## Media about us
+
+- [Dungeons, Dragons, and a Telegram Bot — ITMO Institute of Applied Computer Science](https://www.ipkn.itmo.ru/news/podzemelya-drakony-i-telegram-bot).
+- [“Total Recall” and “WhiningMeter”: How the DevDays Fall 2024 hackathon went — ITMO Institute of Applied Computer Science](https://www.ipkn.itmo.ru/dd-fall2024).
+
+## Recognition
+
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/daadb78f-621c-46cc-8292-192af801861a" alt="Diploma" style="width:65%; height:auto">
+</div>
