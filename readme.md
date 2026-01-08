@@ -2,6 +2,8 @@
 
 The "D&D Assistant" Telegram bot brings you the joy of gaming. Not enough time to create a character and only 10 minutes left before the session? Yet again, your GM asks you not to create a fifth human fighter in the party? The "D&D Assistant" is here to help!
 
+The bot is avaiable **[here](https://t.me/dnd_ai_assistant_bot)**.
+
 ## Adventure Description
 
 "D&D Assistant" is a solution for character generation in *Dungeons & Dragons*. Our project allows you, via a Telegram bot, to generate a full-fledged, ready-to-play character sheet according to your chosen criteria. The user can either generate a completely random character or fill in some fields on the character sheet and have the rest generated so that they fit with what's already been chosen.
