@@ -365,17 +365,19 @@ async def handle_spells(poll_answer: PollAnswer, state: FSMContext) -> None:
 @r.message(Form.llm)
 async def handle_llm(message: Message, state: FSMContext) -> None:
     if message.text.lower() == "generate quenta":
-        await message.answer(
-            "Enter keywords to generate character's quenta (separated by comma):",
-            reply_markup=ReplyKeyboardRemove()
-        )
-        await state.set_state(Form.quenta)
+        # await message.answer(
+        #     "Enter keywords to generate character's quenta (separated by comma):",
+        #     reply_markup=ReplyKeyboardRemove()
+        # )
+        # await state.set_state(Form.quenta)
+        await message.answer("Sorry, this option is not available now", reply_markup=kb.use_llm())
     elif message.text.lower() == "generate portrait":
-        await message.answer(
-            "Enter keywords to generate character's portrait (separated by comma):",
-            reply_markup=ReplyKeyboardRemove()
-        )
-        await state.set_state(Form.portrait)
+        # await message.answer(
+        #     "Enter keywords to generate character's portrait (separated by comma):",
+        #     reply_markup=ReplyKeyboardRemove()
+        # )
+        # await state.set_state(Form.portrait)
+        await message.answer("Sorry, this option is not available now", reply_markup=kb.use_llm())
     elif message.text.lower() == "quit":
         await message.answer("Farewell! To use the bot again, type /start", reply_markup=ReplyKeyboardRemove())
         await state.clear()
