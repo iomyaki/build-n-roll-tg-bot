@@ -60,10 +60,10 @@ If you would like to contribute to the project, please fork the repository and s
 ## Developers
 
 - GM (team lead, algorithm development) — Ivan Zolotnikov (*Иван Золотников*), [tg](https://t.me/Cat_of_Iello).
-- Warlock (bot development) — Ivan Myakinkov (*Иван Мякиньков*), [tg](https://t.me/iomyaki).
+- Warlock (bot development) — Ivan Myakinkov (*Иван Мякиньков*), io.mknkv+dnd@gmail.com.
 - Fighter (spell database development) — Ivan Stupnitsky (*Иван Ступницкий*), [tg](https://t.me/YanagiRu).
 - Wizard (API integration) — Matvey Bagrov (*Матвей Багров*), [tg](https://t.me/the_big_bagrovski).
-- Monk (bot development, testing) — Alexander Kryukov (*Александр Крюков*).
+- Monk (bot development, testing) — Alexander Kryukov (*Александр Крюков*), [tg](https://t.me/kruxx).
 
 ## Presentation Materials
 
