@@ -1,0 +1,11 @@
+.git
+.idea
+.venv
+__pycache__
+**/__pycache__
+.pytest_cache
+.env
+bot_logs.log
+interactions.txt
+.interactions.txt.*.tmp
+*.jpeg

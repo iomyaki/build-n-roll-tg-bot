@@ -4,6 +4,11 @@ services:
   bot:
     build: .
     container_name: dnd_bot
+    env_file:
+      - .env
+    volumes:
+      # Mount the directory: log cleanup atomically replaces interactions.txt.
+      - .:/bot
     ports:
       - "8000:8000"
     command: ["python", "main.py"]
